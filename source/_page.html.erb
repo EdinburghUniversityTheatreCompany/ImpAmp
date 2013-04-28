@@ -1,0 +1,15 @@
+<div class="row">
+  <% for key in settings.keyboard %>
+    <div class="pad span1">
+      <a class="btn" data-shortcut="<%= key %>">
+        <span class="name"></span>
+
+        <audio></audio>
+
+        <div class="progress" style="display: none;">
+          <div class="bar"></div>
+        </div>
+      </a>
+    </div>
+  <% end %>
+</div>

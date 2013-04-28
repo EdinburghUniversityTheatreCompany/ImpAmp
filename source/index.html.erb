@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ImpAmpII</title>
+
+    <%= stylesheet_link_tag 'ImpAmp' %>
+
+    <%= javascript_include_tag 'ImpAmp' %>
+  </head>
+
+  <body>
+    <div class="btn-group options">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <i class="icon-cog"></i>
+          <i class="icon-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a id="delete_mode" href="#"><i class="icon-trash"></i><span>Enter Delete Mode</span></a></li>
+          <li class="divider"></li>
+          <li><a id="importBtn" href="#"><i class="icon-download-alt"></i><span>Import Pads</span></a></li>
+          <li><a id="exportBtn" href="#"><i class="icon-upload-alt"></i>  <span>Export Pads</span></a></li>
+        </ul>
+    </div>
+    <div class="container">
+      <div class="pages-container">
+        <% pages = (1..9).to_a.push(0) %>
+        <ul class="nav nav-tabs page-nav">
+          <% for i in pages %>
+            <li><a href="#page_<%= i %>" data-toggle="tab" data-shortcut="<%= i %>">Page <%= i %></a></li>
+          <% end %>
+        </ul>
+        <div id="pad-pages" class="tab-content">
+          <% for i in pages %>
+            <div class="tab-pane pad-page <%= "active" if i == 1 %>" id="page_<%= i %>">
+              <%= partial 'page',       locals: { shortcut: i } %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
