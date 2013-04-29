@@ -4,6 +4,7 @@
 //= require modernizr
 //= require FeatureDetection/FeatureDetection
 //= require Storage/utils
+//= require Storage/IndexedDB/_IndexedDB
 //= require Storage/WebSQL/_WebSQL
 //= require Storage/export
 //= require Storage/import
