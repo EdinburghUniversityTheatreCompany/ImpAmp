@@ -6,5 +6,6 @@
 //= require Storage/utils
 //= require Storage/WebSQL/_WebSQL
 //= require Storage/export
+//= require Storage/import
 //= require_tree ./Pads
 //= require keyboard

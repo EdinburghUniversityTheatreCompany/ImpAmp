@@ -77,7 +77,7 @@ class window.WebSQLStorage
 
   export: ->
     data = {}
-    data.pads = {}
+    data.pages = {}
 
     @db.transaction (tx) ->
       tx.executeSql "SELECT * FROM Pads"
@@ -86,12 +86,43 @@ class window.WebSQLStorage
         i = 0
         while i < results.rows.length
           row = results.rows.item(i)
-          page = data.pads[row.page] || {}
+          page = data.pages[row.page] || {}
           page[row.key] = row
-          data.pads[row.page] = page
+          data.pages[row.page] = page
           i++
 
         json = JSON.stringify(data)
         blob = new Blob([json], { type: "application/json" })
 
         impamp.saveBlob("impamp.iajson", blob)
+
+  import: (file, progress, callback) ->
+    reader = new FileReader()
+    reader.onload = (e) =>
+      data = JSON.parse(e.target.result)
+
+      transactions = []
+      for num, page of data.pages
+        for key, row of page
+          deferred = $.Deferred()
+          transactions.push(deferred.promise())
+          @db.transaction (tx) ->
+            tx.executeSql """
+                          INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?)
+                          """
+            , [row.page, row.key, row.name, row.file]
+            , ->
+              deferred.resolve()
+            , (tx, error) ->
+              console.log error
+      waiting  = $.when.apply($, transactions)
+      complete = 0
+      waiting.then ->
+        complete += 1
+        progress?(complete, transactions.length)
+        return
+      waiting.done ->
+        callback?()
+        return
+
+    reader.readAsText(file);
