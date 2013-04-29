@@ -92,5 +92,6 @@ class window.WebSQLStorage
           i++
 
         json = JSON.stringify(data)
+        blob = new Blob([json], { type: "application/json" })
 
-        #TODO: Save json
+        impamp.saveBlob("impamp.iajson", blob)

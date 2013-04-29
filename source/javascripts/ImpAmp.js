@@ -3,6 +3,8 @@
 //= require bootstrap
 //= require modernizr
 //= require FeatureDetection/FeatureDetection
+//= require Storage/utils
 //= require Storage/WebSQL/_WebSQL
+//= require Storage/export
 //= require_tree ./Pads
 //= require keyboard
