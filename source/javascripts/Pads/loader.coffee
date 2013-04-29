@@ -13,10 +13,9 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
       impamp.loadPad($pad, storage)
     return
 
+  $pad.find(".name").text("")
   $pad.removeClass "disabled"
   $pad.removeClass "error"
-  $pad.find(".name").text("")
-  $pad.find("audio").attr("src", "")
 
   page = impamp.pads.getPage $pad
   key  = impamp.pads.getKey  $pad
