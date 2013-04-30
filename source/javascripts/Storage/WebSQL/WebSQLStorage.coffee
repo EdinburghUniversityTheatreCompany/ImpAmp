@@ -1,26 +1,12 @@
 class window.WebSQLStorage
   @db: null;
 
-  @convertDataURIToBlob: (dataURI) ->
-    BASE64_MARKER = ";base64,"
-    base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length
-    base64 = dataURI.substring(base64Index)
-    raw = window.atob(base64)
-    rawLength = raw.length
-    uInt8Array = new Uint8Array(rawLength)
-    i = 0
-
-    while i < rawLength
-      uInt8Array[i] = raw.charCodeAt(i)
-      ++i
-    new Blob([uInt8Array.buffer])
-
   @rowToPad: (row) ->
     data =
       page: row.page
       key:  row.key
       name: row.name
-      file: WebSQLStorage.convertDataURIToBlob row.file
+      file: impamp.convertDataURIToBlob row.file
     return data
 
   constructor: ->
@@ -104,18 +90,20 @@ class window.WebSQLStorage
       transactions = []
       for num, page of data.pages
         for key, row of page
-          deferred = $.Deferred()
-          transactions.push(deferred.promise())
-          @db.transaction (tx) ->
-            tx.executeSql """
-                          INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?)
-                          """
-            , [row.page, row.key, row.name, row.file]
-            , ->
-              deferred.resolve()
-            , (tx, error) ->
-              console.log error
-      waiting  = $.when.apply($, transactions)
+          ((row, db) ->
+            deferred = $.Deferred()
+            transactions.push(deferred.promise())
+            db.transaction (tx) ->
+              tx.executeSql """
+                            INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?)
+                            """
+              , [row.page, row.key, row.name, row.file]
+              , ->
+                deferred.resolve()
+              , (tx, error) ->
+                console.log error
+          )(row, @db)
+      waiting  = $.when.apply(null, transactions)
       complete = 0
       waiting.then ->
         complete += 1

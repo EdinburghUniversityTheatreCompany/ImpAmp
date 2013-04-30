@@ -44,7 +44,7 @@ class window.IndexedDBStorage
   removePad: (page, key, callback) ->
     trans = @db.transaction(["pad"], "readwrite")
     store = trans.objectStore("pad")
-    request = store.delete(page, key)
+    request = store.delete([page, key])
     request.onsuccess = ->
       callback?()
 
@@ -54,6 +54,8 @@ class window.IndexedDBStorage
     data = {}
     data.pages = {}
 
+    promises = []
+
     trans = @db.transaction(["pad"], "readonly")
     store = trans.objectStore("pad")
     cursor = store.openCursor()
@@ -62,22 +64,66 @@ class window.IndexedDBStorage
       if result
         pad = result.value
         pad.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
+
+        deferred = $.Deferred()
+        promises.push(deferred.promise())
+
         reader = new FileReader();
-        reader.onload = (e) =>
+        reader.onload = (e) ->
           page = data.pages[pad.page] || {}
 
           page[pad.key] = pad
           pad.file = e.target.result
 
           data.pages[pad.page] = page
-          result.continue();
+
+          deferred.resolve()
+          return
+        reader.onerror = (e) ->
+          deferred.reject()
+          console.log e
+          return
         reader.readAsDataURL(pad.file);
 
-    trans.oncomplete = ->
-      json = JSON.stringify(data)
-      blob = new Blob([json], { type: "application/json" })
+        result.continue();
+        return
 
-      impamp.saveBlob("impamp.iajson", blob)
+    trans.oncomplete = ->
+      waiting = $.when.apply($, promises)
+      waiting.then ->
+        console.log "One done"
+        return
+      waiting.done ->
+        json = JSON.stringify(data)
+        blob = new Blob([json], { type: "application/json" })
+
+        impamp.saveBlob("impamp.iajson", blob)
 
   import: (file, progress, callback) ->
-    return
+    reader = new FileReader()
+    reader.onload = (e) =>
+      data = JSON.parse(e.target.result)
+
+      promises = []
+      for num, page of data.pages
+        for key, row of page
+          ((row, me) ->
+            deferred = $.Deferred()
+            promises.push(deferred.promise())
+
+            file = impamp.convertDataURIToBlob row.file
+
+            me.setPad row.page, row.key, row.name, file, ->
+              deferred.resolve()
+          )(row, this)
+
+      waiting  = $.when.apply($, promises)
+      complete = 0
+      waiting.then ->
+        complete += 1
+        progress?(complete, promises.length)
+        return
+      waiting.done ->
+        callback?()
+        return
+    reader.readAsText(file);
