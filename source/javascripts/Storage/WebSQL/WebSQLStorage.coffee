@@ -47,7 +47,7 @@ class window.WebSQLStorage
           callback WebSQLStorage.rowToPad(row)
 
 
-  setPad: (page, key, name, file, filename, filesize, callback, updatedAt = new Date()) ->
+  setPad: (page, key, name, file, filename, filesize, callback, updatedAt = new Date().getTime()) ->
     reader = new FileReader();
     reader.onload = (e) =>
       @db.transaction (tx) ->

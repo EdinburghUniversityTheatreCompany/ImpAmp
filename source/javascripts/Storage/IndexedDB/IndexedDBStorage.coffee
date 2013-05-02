@@ -26,7 +26,7 @@ class window.IndexedDBStorage
       callback e.target.result
 
 
-  setPad: (page, key, name, file, filename, filesize, callback, updatedAt = new Date()) ->
+  setPad: (page, key, name, file, filename, filesize, callback, updatedAt = new Date().getTime()) ->
     trans = @db.transaction(["pad"], "readwrite")
     store = trans.objectStore("pad")
     request = store.put(

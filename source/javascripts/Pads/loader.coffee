@@ -13,16 +13,21 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
       impamp.loadPad($pad, storage)
     return
 
-  $pad.find(".name").text("")
-  $pad.removeClass "disabled"
-  $pad.removeClass "error"
-
   page = impamp.pads.getPage $pad
   key  = impamp.pads.getKey  $pad
 
   storage.getPad page, key, (padData) ->
+    $pad.find(".name").text("")
+    $pad.removeClass "disabled"
+    $pad.removeClass "error"
+
     if not padData?
       $pad.addClass "disabled"
+      $pad.removeData('name', null)
+      $pad.removeData('filename', null)
+      $pad.removeData('updatedAt', null)
+      $pad.removeData('filesize', null)
+
       return
 
     $pad.data('name', padData.name)

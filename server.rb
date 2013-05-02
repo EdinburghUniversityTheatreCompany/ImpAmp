@@ -37,6 +37,29 @@ class ImpAmpServer < Sinatra::Base
     return :success
   end
 
+  delete '/pad/:page_no/:key' do |page_no, key|
+    data = JSON.parse( IO.read('impamp_server.json') )
+
+    pages = data["pages"]
+    page = pages[page_no]
+
+    pad  = page[key] || {}
+
+    pad[:name]      = nil
+    pad[:filename]  = nil
+    pad[:filesize]  = nil
+    pad[:updatedAt] = Time.now.to_i * 1000
+
+    page[key]     = pad
+    data["pages"][page_no] = page
+
+    File.open('impamp_server.json','wb+') do |f|
+      f.write data.to_json
+    end
+
+    return :success
+  end
+
   get '/audio/:filename' do |filename|
     send_file "audio/#{filename}"
   end
