@@ -26,20 +26,24 @@ class window.IndexedDBStorage
       callback e.target.result
 
 
-  setPad: (page, key, name, file, callback) ->
-    trans = @db.transaction(["pad"], "readwrite")
-    store = trans.objectStore("pad")
-    request = store.put(
-      page: page
-      key:  key
-      name: name
-      file: file
-    )
-    request.onsuccess = (e) ->
-      callback?()
+  setPad: (page, key, name, file, filename, callback, updatedAt = new Date()) ->
+    impamp.getBlobHash file, (filehash) =>
+      trans = @db.transaction(["pad"], "readwrite")
+      store = trans.objectStore("pad")
+      request = store.put(
+        page: page
+        key:  key
+        name: name
+        file: file
+        filename:  filename
+        filehash:  filehash
+        updatedAt: updatedAt
+      )
+      request.onsuccess = (e) ->
+        callback?()
 
-    request.onerror = (e) ->
-      console.log e.value
+      request.onerror = (e) ->
+        console.log e.value
 
   removePad: (page, key, callback) ->
     trans = @db.transaction(["pad"], "readwrite")
@@ -113,7 +117,7 @@ class window.IndexedDBStorage
 
             file = impamp.convertDataURIToBlob row.file
 
-            me.setPad row.page, row.key, row.name, file, ->
+            me.setPad row.page, row.key, row.name, file, row.filename, ->
               deferred.resolve()
           )(row, this)
 

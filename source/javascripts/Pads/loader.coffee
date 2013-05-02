@@ -25,6 +25,11 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
       $pad.addClass "disabled"
       return
 
+    $pad.data('name', padData.name)
+    $pad.data('filename', padData.filename)
+    $pad.data('updatedAt', padData.updatedAt)
+    $pad.data('filehash', padData.filehash)
+
     url = window.URL.createObjectURL(padData.file);
     $pad.find("audio").attr("src", url)
     $pad.find(".name").text(padData.name)

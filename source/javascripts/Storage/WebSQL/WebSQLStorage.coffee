@@ -6,7 +6,10 @@ class window.WebSQLStorage
       page: row.page
       key:  row.key
       name: row.name
+      filename: row.filename
+      filehash: row.filehash
       file: impamp.convertDataURIToBlob row.file
+      updatedAt: row.updatedAt
     return data
 
   constructor: ->
@@ -20,6 +23,9 @@ class window.WebSQLStorage
                       key,
                       name,
                       file,
+                      filename,
+                      filehash,
+                      updatedAt,
                       PRIMARY KEY (page, key)
                     )
                     """
@@ -41,14 +47,14 @@ class window.WebSQLStorage
           callback WebSQLStorage.rowToPad(row)
 
 
-  setPad: (page, key, name, file, callback) ->
+  setPad: (page, key, name, file, filename, callback, updatedAt = new Date()) ->
     reader = new FileReader();
     reader.onload = (e) =>
       @db.transaction (tx) ->
         tx.executeSql """
-                      INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?)
+                      INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
                       """
-        , [page, key, name, e.target.result],
+        , [page, key, name, e.target.result, filename, md5(e.target.result), updatedAt],
           callback?()
         , (tx, error) ->
           console.log error
@@ -95,9 +101,9 @@ class window.WebSQLStorage
             transactions.push(deferred.promise())
             db.transaction (tx) ->
               tx.executeSql """
-                            INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?)
+                            INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
                             """
-              , [row.page, row.key, row.name, row.file]
+              , [row.page, row.key, row.name, row.file, row.filename, row.filehash, row.updatedAt]
               , ->
                 deferred.resolve()
               , (tx, error) ->

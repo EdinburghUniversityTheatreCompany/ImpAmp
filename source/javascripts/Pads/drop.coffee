@@ -29,7 +29,7 @@ $ ->
         name = file.name
 
         impamp.storage.done (storage) ->
-          storage.setPad page, key, name, file, ->
+          storage.setPad page, key, name, file, file.name, ->
             impamp.loadPad($pad)
 
       return false

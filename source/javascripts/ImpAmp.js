@@ -2,6 +2,7 @@
 //= require setup
 //= require bootstrap
 //= require modernizr
+//= require md5
 //= require FeatureDetection/FeatureDetection
 //= require Storage/utils
 //= require Storage/IndexedDB/_IndexedDB
@@ -10,3 +11,4 @@
 //= require Storage/import
 //= require_tree ./Pads
 //= require keyboard
+//= require sync
