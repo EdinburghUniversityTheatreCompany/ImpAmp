@@ -22,9 +22,9 @@ sync = ->
         filesize  = $pad.data('filesize')
         updatedAt = $pad.data('updatedAt')
 
-        if serverPad.name != name || serverPad.filename != filename || serverPad.filesize != filesize
+        if serverPad.name != name || serverPad.filename != filename || `serverPad.filesize != filesize`
           updatePad($pad, serverPad)
-        else if serverPad.filename? && serverPad.updatedAt != updatedAt
+        else if serverPad.filename? && `serverPad.updatedAt != updatedAt`
           updatePad($pad, serverPad)
 
 updatePad = ($pad, serverPad) ->
