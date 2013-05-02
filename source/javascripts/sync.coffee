@@ -48,6 +48,7 @@ sendToServer = ($pad) ->
       # First, upload the file
       oReq = new XMLHttpRequest();
       oReq.open("POST", syncUrl + "audio/" + padData.filename, true);
+      oReq.setRequestHeader("Content-Type", "application/octet-stream")
       oReq.onload = (oEvent) ->
 
         # Remove the blob
@@ -77,4 +78,4 @@ getFromServer = ($pad, serverPad) ->
 
 
 $.when(impamp.storage, impamp.docReady).done ->
-  setInterval sync, 15 * 1000
+  setInterval sync, 10 * 1000

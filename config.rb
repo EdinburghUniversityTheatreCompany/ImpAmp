@@ -1,3 +1,6 @@
+require 'sinatra'
+use ImpAmpServer
+
 ###
 # Page options, layouts, aliases and proxies
 ###

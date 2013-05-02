@@ -12,3 +12,6 @@
 
 # Ignore Sass' cache
 /.sass-cache
+
+/audio
+impamp_server.json
