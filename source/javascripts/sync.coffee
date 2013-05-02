@@ -18,12 +18,10 @@ sync = ->
 
         name      = $pad.data('name')
         filename  = $pad.data('filename')
-        filehash  = $pad.data('filehash')
+        filesize  = $pad.data('filesize')
         updatedAt = $pad.data('updatedAt')
 
-        if serverPad.name != name || serverPad.filename != filename
-          updatePad($pad, serverPad)
-        else if serverPad.filehash != filehash && filehash != "" # Don't keep updating if the hash hasn't been calculated yet.
+        if serverPad.name != name || serverPad.filename != filename || serverPad.filesize != filesize || serverPad.updatedAt != updatedAt
           updatePad($pad, serverPad)
 
 updatePad = ($pad, serverPad) ->
@@ -37,10 +35,6 @@ updatePad = ($pad, serverPad) ->
 sendToServer = ($pad) ->
   page = impamp.pads.getPage $pad
   key  = impamp.pads.getKey  $pad
-  filehash = $pad.data('filehash')
-
-  # Ensure the file has been hashed...
-  return unless filehash?
 
   impamp.storage.done (storage) ->
     storage.getPad page, key, (padData) ->
@@ -49,11 +43,11 @@ sendToServer = ($pad) ->
       oReq = new XMLHttpRequest();
       oReq.open("POST", syncUrl + "audio/" + padData.filename, true);
       oReq.setRequestHeader("Content-Type", "application/octet-stream")
-      oReq.onload = (oEvent) ->
+      oReq.onload = (e) ->
+        return unless this.status == 200 && this.readyState == 4
 
         # Remove the blob
         delete padData.file
-        padData.filehash = filehash
 
         # Then send the padData
         $.post (syncUrl + "pad/#{padData.page}/#{padData.key}"), padData
@@ -69,9 +63,11 @@ getFromServer = ($pad, serverPad) ->
   oReq.open("GET", syncUrl + "audio/#{serverPad.filename}", true);
   oReq.responseType = "blob";
   oReq.onload = (e) ->
+    return unless this.status == 200 && this.readyState == 4
+
     blob = oReq.response
     impamp.storage.done (storage) ->
-      storage.setPad page, key, serverPad.name, blob, serverPad.filename, ->
+      storage.setPad page, key, serverPad.name, blob, serverPad.filename, serverPad.filesize, ->
         impamp.loadPad($pad, storage)
       , serverPad.updatedAt
   oReq.send();

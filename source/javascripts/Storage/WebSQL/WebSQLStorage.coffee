@@ -7,7 +7,7 @@ class window.WebSQLStorage
       key:  row.key
       name: row.name
       filename: row.filename
-      filehash: row.filehash
+      filesize: row.filesize
       file: impamp.convertDataURIToBlob row.file
       updatedAt: row.updatedAt
     return data
@@ -24,7 +24,7 @@ class window.WebSQLStorage
                       name,
                       file,
                       filename,
-                      filehash,
+                      filesize,
                       updatedAt,
                       PRIMARY KEY (page, key)
                     )
@@ -47,14 +47,14 @@ class window.WebSQLStorage
           callback WebSQLStorage.rowToPad(row)
 
 
-  setPad: (page, key, name, file, filename, callback, updatedAt = new Date()) ->
+  setPad: (page, key, name, file, filename, filesize, callback, updatedAt = new Date()) ->
     reader = new FileReader();
     reader.onload = (e) =>
       @db.transaction (tx) ->
         tx.executeSql """
                       INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
                       """
-        , [page, key, name, e.target.result, filename, md5(e.target.result), updatedAt],
+        , [page, key, name, e.target.result, filename, filesize, updatedAt],
           callback?()
         , (tx, error) ->
           console.log error
@@ -103,7 +103,7 @@ class window.WebSQLStorage
               tx.executeSql """
                             INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
                             """
-              , [row.page, row.key, row.name, row.file, row.filename, row.filehash, row.updatedAt]
+              , [row.page, row.key, row.name, row.file, row.filename, row.filesize, row.updatedAt]
               , ->
                 deferred.resolve()
               , (tx, error) ->

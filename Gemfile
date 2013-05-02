@@ -8,7 +8,6 @@ gem "rb-inotify"
 
 gem "sass-rails"
 gem "bootstrap-sass"
-gem 'font-awesome-middleman'
+gem "font-awesome-middleman"
 
-# Sinatra stuff
-gem "sinatra-cross_origin", git: 'git://github.com/britg/sinatra-cross_origin.git'
+gem "thin"

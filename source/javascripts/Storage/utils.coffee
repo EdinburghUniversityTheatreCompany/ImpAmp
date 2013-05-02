@@ -21,9 +21,3 @@ impamp.convertDataURIToBlob = (dataURI) ->
     uInt8Array[i] = raw.charCodeAt(i)
     ++i
   new Blob([uInt8Array.buffer])
-
-impamp.getBlobHash = (blob, callback) ->
-  fileReader = new FileReader();
-  fileReader.onload = (e) ->
-    callback md5(e.target.result)
-  fileReader.readAsBinaryString(blob);

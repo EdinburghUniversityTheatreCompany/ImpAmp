@@ -28,7 +28,7 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
     $pad.data('name', padData.name)
     $pad.data('filename', padData.filename)
     $pad.data('updatedAt', padData.updatedAt)
-    $pad.data('filehash', padData.filehash)
+    $pad.data('filesize', padData.filesize)
 
     url = window.URL.createObjectURL(padData.file);
     $pad.find("audio").attr("src", url)

@@ -2,7 +2,6 @@
 //= require setup
 //= require bootstrap
 //= require modernizr
-//= require md5
 //= require FeatureDetection/FeatureDetection
 //= require Storage/utils
 //= require Storage/IndexedDB/_IndexedDB
