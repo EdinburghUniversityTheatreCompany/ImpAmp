@@ -13,5 +13,9 @@
 # Ignore Sass' cache
 /.sass-cache
 
+# Rack / Passenger Directories
+/tmp
+/public
+
 /audio
 impamp_server.json
