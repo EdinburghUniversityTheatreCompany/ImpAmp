@@ -38,7 +38,7 @@ importModal = """
     <h3>Import Pads from File</h3>
   </div>
   <div class="modal-body">
-    <input type="file">
+    <input type="file" accept=".iajson">
     <div class="progress">
       <div class="bar"></div>
     </div>
