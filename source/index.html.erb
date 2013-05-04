@@ -9,17 +9,23 @@
   </head>
 
   <body>
-    <div class="btn-group options">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-cog"></i>
-          <i class="icon-caret-down"></i>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a id="delete_mode" href="#"><i class="icon-trash"></i><span>Enter Delete Mode</span></a></li>
-          <li class="divider"></li>
-          <li><a id="importBtn" href="#"><i class="icon-download-alt"></i><span>Import Pads</span></a></li>
-          <li><a id="exportBtn" href="#"><i class="icon-upload-alt"></i>  <span>Export Pads</span></a></li>
-        </ul>
+    <div class="options">
+      <a id="syncBtn" href="#" class="btn" data-sync-enabled="true">
+        <i class="icon-time"></i> Waiting for Sync
+      </a>
+
+      <div class="btn-group">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-cog"></i>
+            <i class="icon-caret-down"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a id="delete_mode" href="#"><i class="icon-trash"></i><span>Enter Delete Mode</span></a></li>
+            <li class="divider"></li>
+            <li><a id="importBtn" href="#"><i class="icon-download-alt"></i><span>Import Pads</span></a></li>
+            <li><a id="exportBtn" href="#"><i class="icon-upload-alt"></i>  <span>Export Pads</span></a></li>
+          </ul>
+      </div>
     </div>
     <div class="container">
       <div class="pages-container">
