@@ -19,3 +19,6 @@
 
 /audio
 impamp_server.json
+
+# Auth
+htpasswd
