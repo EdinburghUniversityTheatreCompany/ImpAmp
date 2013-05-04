@@ -15,10 +15,12 @@ class window.WebSQLStorage
   constructor: ->
     me = this;
 
-    @db = openDatabase 'ImpAmpDB', '1.0', 'ImpAmp storage database', 2 * 1024 * 1024 * 1024
-    @db.transaction (tx) ->
+    @db = openDatabase 'ImpAmpDB', '', 'ImpAmp storage database', 2 * 1024 * 1024 * 1024
+
+    migrator = new WebSQLMigrator(@db)
+    migrator.migration "", "1.0", (tx) ->
       tx.executeSql """
-                    CREATE TABLE IF NOT EXISTS Pads(
+                    CREATE TABLE Pads(
                       page,
                       key,
                       name,
@@ -29,10 +31,18 @@ class window.WebSQLStorage
                       PRIMARY KEY (page, key)
                     )
                     """
-      , [], ->
-        impamp.storage.resolve me
-      , (tx, error) ->
-        console.log error
+
+    migrator.migration "1.0", "1.1", (tx) ->
+      tx.executeSql """
+                    CREATE TABLE Pages(
+                      pageNo,
+                      name,
+                      PRIMARY KEY (pageNo)
+                    )
+                    """
+
+    migrator.migrate ->
+      impamp.storage.resolve me
 
   getPad: (page, key, callback) ->
     rowToPad = @rowToPad
@@ -66,6 +76,27 @@ class window.WebSQLStorage
         , [page, key]
         , (tx, results) ->
           callback?()
+
+  setPage: (pageNo, name, callback) ->
+    @db.transaction (tx) ->
+      tx.executeSql """
+                    INSERT OR REPLACE INTO Pages VALUES (?, ?)
+                    """
+      , [pageNo, name],
+        callback?()
+      , (tx, error) ->
+        console.log error
+
+  getPage: (pageNo, callback) ->
+    @db.transaction (tx) ->
+      tx.executeSql "SELECT * FROM Pages WHERE pageNo=?"
+      , [pageNo]
+      , (tx, results) ->
+        if results.rows.length <= 0
+          callback null
+        else
+          row = results.rows.item(0)
+          callback row
 
   export: ->
     data = {}

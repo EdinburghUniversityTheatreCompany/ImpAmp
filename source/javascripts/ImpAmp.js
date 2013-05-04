@@ -8,6 +8,7 @@
 //= require Storage/WebSQL/_WebSQL
 //= require Storage/export
 //= require Storage/import
+//= require_tree ./Pages
 //= require_tree ./Pads
 //= require keyboard
 //= require sync
