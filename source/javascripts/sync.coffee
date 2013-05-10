@@ -12,6 +12,7 @@ sync = ->
 
   $.ajax
     url: syncUrl + "impamp_server.json",
+    type: "GET",
     xhrFields:
       withCredentials: true
     success: (data) ->

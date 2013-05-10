@@ -13,3 +13,8 @@ impamp.storage = $.Deferred();
 
 $ ->
   impamp.docReady.resolve();
+
+  $page1Nav = $('.page-nav [href="#page_1"]')
+  $page1 = $($page1Nav.attr('href'))
+  $page1Nav.click()
+  impamp.addPageHandlers($page1)

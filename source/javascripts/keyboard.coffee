@@ -20,14 +20,14 @@ addNavHandlers = ->
     shortcut = $item.data('shortcut')
     keycode = shortcut.toString().charCodeAt(0)
 
+    $item.click ->
+      page = $($item.attr('href'))
+      addPageHandlers(page)
+
     $body.on 'keydown', (e) ->
       return unless e.keyCode == keycode
 
       $item.click()
-
-      page = $($item.attr('href'))
-      addPageHandlers(page)
-
       return
     return
 
