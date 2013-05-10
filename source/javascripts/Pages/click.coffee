@@ -2,11 +2,13 @@ $ ->
   $('.page-nav [href^="#page"]').dblclick (e) ->
     $pageNav = $(e.currentTarget)
 
-    $modal = $(importModal)
+    $modal = $(nameChangeModal)
     $('body').append($modal)
     $modal.modal('show')
     $modal.on 'hidden', ->
       $modal.remove()
+
+    $('#renameInput').val($pageNav.data("name"))
 
     $('#renameButton').click (e) ->
       e.preventDefault()
@@ -19,7 +21,7 @@ $ ->
 
       return false
 
-importModal = """
+nameChangeModal = """
 <div class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
