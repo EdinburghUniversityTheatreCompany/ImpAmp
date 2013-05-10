@@ -4,7 +4,7 @@ class window.IndexedDBStorage
   constructor: ->
     @db = null
 
-    version = 4;
+    version = 5;
     request = indexedDB.open "ImpAmpDB", version;
     request.onsuccess = (e) =>
       @db = e.target.result
@@ -14,9 +14,16 @@ class window.IndexedDBStorage
 
     request.onupgradeneeded = (e) =>
       db = e.target.result;
-      store = db.createObjectStore "pad",
-        keyPath: ['page', 'key']
-      store.createIndex("page, key", ['page', 'key'], { unique: true })
+
+      if e.oldVersion < 4
+        store = db.createObjectStore "pad",
+          keyPath: ['page', 'key']
+        store.createIndex("page, key", ['page', 'key'], { unique: true })
+
+      if e.oldVersion < 5
+        store = db.createObjectStore "page",
+          keyPath: "pageNo"
+        store.createIndex("pageNo", ["pageNo"], { unique : true })
 
   getPad: (page, key, callback) ->
     trans = @db.transaction(["pad"], "readwrite")
@@ -51,6 +58,27 @@ class window.IndexedDBStorage
     request.onsuccess = ->
       callback?()
 
+  setPage: (pageNo, name, callback, updatedAt = new Date().getTime()) ->
+    trans = @db.transaction(["page"], "readwrite")
+    store = trans.objectStore("page")
+    request = store.put
+      pageNo:    pageNo
+      name:      name
+      updatedAt: updatedAt
+
+    request.onsuccess = (e) ->
+      callback?()
+
+    request.onerror = (e) ->
+      console.log e.value
+
+  getPage: (pageNo, callback) ->
+    trans = @db.transaction(["page"], "readwrite")
+    store = trans.objectStore("page")
+    index = store.index("pageNo");
+    index.get([pageNo]).onsuccess = (e) ->
+      callback e.target.result
+
   export: ->
     #http://www.raymondcamden.com/index.cfm/2012/8/23/Proof-of-Concept--Build-a-download-feature-for-IndexedDB
 
@@ -59,10 +87,30 @@ class window.IndexedDBStorage
 
     promises = []
 
-    trans = @db.transaction(["pad"], "readonly")
-    store = trans.objectStore("pad")
-    cursor = store.openCursor()
-    cursor.onsuccess = (e) ->
+    trans = @db.transaction(["pad, page"], "readonly")
+
+    pageStore = trans.objectStore("page")
+    padStore  = trans.objectStore("pad")
+
+    pageCursor = pageStore.openCursor()
+    pageCursor.onsuccess = (e) ->
+      result = e.target.result
+      if result
+        dbPage = result.value
+        dbPage.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
+
+        page = data.pages[dbPage.pageNo] || {}
+
+        page.name      = dbPage.name
+        page.updatedAt = dbPage.updatedAt
+
+        data.pages[dbPage.pageNo] = page
+
+        result.continue();
+        return
+
+    padCursor = padStore.openCursor()
+    padCursor.onsuccess = (e) ->
       result = e.target.result
       if result
         pad = result.value
@@ -109,6 +157,7 @@ class window.IndexedDBStorage
 
       promises = []
       for num, page of data.pages
+        me.setPage num, page.name, null, row.updatedAt
         for key, row of page
           ((row, me) ->
             deferred = $.Deferred()
@@ -118,6 +167,7 @@ class window.IndexedDBStorage
 
             me.setPad row.page, row.key, row.name, file, row.filename, row.filesize, ->
               deferred.resolve()
+            , row.updatedAt
           )(row, this)
 
       waiting  = $.when.apply($, promises)
