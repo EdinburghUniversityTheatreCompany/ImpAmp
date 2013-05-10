@@ -24,3 +24,5 @@ impamp.loadPage  = loadPage  = ($pageNav, storage) ->
       Page #{pageData.pageNo}<br />
       #{pageData.name}
                   """
+    $pageNav.data("name", pageData.name)
+    $pageNav.data("updatedAt", pageData.updatedAt)

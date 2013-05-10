@@ -60,6 +60,24 @@ class ImpAmpServer < Sinatra::Base
     return :success
   end
 
+  post '/page/:page_no' do |page_no|
+    data = JSON.parse( IO.read('impamp_server.json') )
+
+    pages = data["pages"]
+    page = pages[page_no] || {}
+
+    page[:name]      = params[:name]
+    page[:updatedAt] = params[:updatedAt]
+
+    data["pages"][page_no] = page
+
+    File.open('impamp_server.json','wb+') do |f|
+      f.write data.to_json
+    end
+
+    return :success
+  end
+
   get '/audio/:filename' do |filename|
     send_file "audio/#{filename}"
   end

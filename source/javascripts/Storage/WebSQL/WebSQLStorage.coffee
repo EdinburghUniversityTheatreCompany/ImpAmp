@@ -37,6 +37,7 @@ class window.WebSQLStorage
                     CREATE TABLE Pages(
                       pageNo,
                       name,
+                      updatedAt,
                       PRIMARY KEY (pageNo)
                     )
                     """
@@ -77,12 +78,12 @@ class window.WebSQLStorage
         , (tx, results) ->
           callback?()
 
-  setPage: (pageNo, name, callback) ->
+  setPage: (pageNo, name, callback, updatedAt = new Date().getTime()) ->
     @db.transaction (tx) ->
       tx.executeSql """
-                    INSERT OR REPLACE INTO Pages VALUES (?, ?)
+                    INSERT OR REPLACE INTO Pages VALUES (?, ?, ?)
                     """
-      , [pageNo, name],
+      , [pageNo, name, updatedAt],
         callback?()
       , (tx, error) ->
         console.log error
@@ -144,9 +145,9 @@ class window.WebSQLStorage
           transactions.push(deferred.promise())
 
           tx.executeSql """
-                        INSERT OR REPLACE INTO Pages VALUES (?, ?)
+                        INSERT OR REPLACE INTO Pages VALUES (?, ?, ?)
                         """
-            , [num, page.name]
+            , [num, page.name, page.updatedAt]
             , ->
               for key, row of page
                 tx.executeSql """

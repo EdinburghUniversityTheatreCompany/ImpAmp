@@ -35,6 +35,18 @@ sync = ->
         else if serverPad.filename? && `serverPad.updatedAt != updatedAt`
           updates.push updatePad($pad, serverPad)
 
+      $('.page-nav [href^="#page"]').each (i, pageNav) ->
+        $pageNav = $(pageNav)
+
+        pageNo = impamp.pages.getPageNo $pageNav
+
+        serverPage = data.pages[pageNo] || {}
+
+        name = $pageNav.data("name")
+
+        if serverPage.name != name
+          updates.push updatePage($pageNav, serverPage)
+
       syncWait = $.when.apply($, updates)
       syncWait.done ->
         setSyncButton("ok", "Sync Complete")
@@ -86,6 +98,7 @@ sendToServer = ($pad) ->
         # Then send the padData
         $.ajax
           url:  syncUrl + "pad/#{padData.page}/#{padData.key}"
+          type: "POST"
           data: padData
           error: ->
             deferred.reject()
@@ -127,6 +140,45 @@ impamp.sync.deletePad = deletePad = (page, key) ->
   $.ajax
     type: "DELETE",
     url:  syncUrl + "pad/#{page}/#{key}"
+
+# Should return a jQuery promise.
+updatePage = ($pageNav, serverPage) ->
+  updatedAt = $pageNav.data('updatedAt')
+
+  if (not serverPage.updatedAt?) || (updatedAt > serverPage.updatedAt)
+    return sendPageToServer($pageNav)
+  else
+    deferred = $.Deferred()
+
+    impamp.storage.done (storage) ->
+      pageNo = impamp.pages.getPageNo $pageNav
+
+      storage.setPage pageNo, serverPage.name, ->
+        impamp.loadPage($pageNav)
+        deferred.resolve()
+      , serverPage.updatedAt
+
+    return deferred.promise()
+
+sendPageToServer = ($pageNav) ->
+  deferred = $.Deferred()
+
+  pageNo = impamp.pages.getPageNo $pageNav
+
+  impamp.storage.done (storage) ->
+    storage.getPage pageNo, (pageData) ->
+
+      $.ajax
+        url:  syncUrl + "page/#{pageNo}"
+        type: "POST"
+        data: pageData
+        error: ->
+          deferred.reject()
+
+      deferred.resolve()
+      return
+
+  return deferred.promise()
 
 $ ->
   $('#syncBtn').click (e) ->
