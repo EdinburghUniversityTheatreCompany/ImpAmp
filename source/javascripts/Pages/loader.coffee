@@ -16,7 +16,9 @@ impamp.loadPage  = loadPage  = ($pageNav, storage) ->
   pageNo = impamp.pages.getPageNo $pageNav
 
   storage.getPage pageNo, (pageData) ->
-    return if not pageData?
+    if not pageData?
+      $pageNav.html "Page #{pageNo}"
+      return
 
     $pageNav.html """
       Page #{pageData.pageNo}<br />

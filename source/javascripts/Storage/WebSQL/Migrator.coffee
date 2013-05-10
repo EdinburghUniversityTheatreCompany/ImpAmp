@@ -20,7 +20,7 @@ class window.WebSQLMigrator
       , (err) ->
         console.error "Error!: %o", err  if console.error
       , =>
-        doMigration @db.version, callback
+        @doMigration @db.version, callback
     else
       # No further migrations. Callback.
       callback?()

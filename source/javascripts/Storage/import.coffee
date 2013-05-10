@@ -26,6 +26,7 @@ $ ->
             width: ((complete/total) * 100) + "%"
           return
         , ->
+          impamp.loadPages()
           impamp.loadPads()
           $modal.modal('hide')
           return

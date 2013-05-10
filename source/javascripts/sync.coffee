@@ -75,7 +75,7 @@ sendToServer = ($pad) ->
       oReq.open("POST", syncUrl + "audio/" + padData.filename, true);
       oReq.setRequestHeader("Content-Type", "application/octet-stream")
       oReq.onload = (e) ->
-        if (this.status == 200 || this.status == 304) && this.readyState == 4
+        if not ((this.status == 200 || this.status == 304) && this.readyState == 4)
           # error
           deferred.reject()
           return
@@ -107,7 +107,7 @@ getFromServer = ($pad, serverPad) ->
   oReq.open("GET", syncUrl + "audio/#{serverPad.filename}", true);
   oReq.responseType = "blob";
   oReq.onload = (e) ->
-    if (this.status == 200 || this.status == 304) && this.readyState == 4
+    if not ((this.status == 200 || this.status == 304) && this.readyState == 4)
       # error
       deferred.reject()
       return

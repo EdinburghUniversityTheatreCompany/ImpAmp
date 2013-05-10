@@ -37,7 +37,7 @@ use ImpAmpServer
 #   end
 # end
 
-activate :livereload
+#activate :livereload
 
 activate :directory_indexes
 
