@@ -42,24 +42,10 @@ impamp.addPageHandlers = addPageHandlers = (page) ->
   children.each (i, child) ->
     $child = $(child)
     shortcut = $child.data('shortcut')
-    keycode = shortcut.toString().toUpperCase().charCodeAt(0)
-
-    #An oddity... for some reason chrome converts these incorrectly.
-    if keycode == 92
-      # Backslash
-      keycode = 220
-    if keycode == 47
-      # Forward Slash
-      keycode = 191
-    if keycode == 44
-      # Comma
-      keycode = 188
-    if keycode == 46
-      # Period
-      keycode = 190
+    charcode = shortcut.toString().toUpperCase().charCodeAt(0)
 
     handler = (e) ->
-      return unless e.keyCode == keycode
+      return unless getCharCode(e.keyCode) == charcode
 
       $child.click()
 
@@ -67,6 +53,37 @@ impamp.addPageHandlers = addPageHandlers = (page) ->
     activeHandlers.push handler
 
   return
+
+getCharCode = (keycode) ->
+  # See http://unixpapa.com/js/key.html
+
+  switch keycode
+    when 186
+      # ;
+      return 59
+    when 188
+      # ,
+      return 44
+    when 190
+      # .
+      return 46
+    when 191
+      # /
+      return 47
+    when 219
+      # [
+      return 91
+    when 220
+      # \
+      return 92
+    when 221
+      # ]
+      return 93
+    when 222
+      # '
+      return 39
+    else
+      return keycode
 
 $ ->
   addNavHandlers()
