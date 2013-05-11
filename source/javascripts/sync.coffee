@@ -84,6 +84,8 @@ updatePad = ($pad, serverPad) ->
 sendToServer = ($pad) ->
   deferred = $.Deferred()
 
+  $progress = $pad.find(".progress")
+
   page = impamp.pads.getPage $pad
   key  = impamp.pads.getKey  $pad
 
@@ -94,7 +96,11 @@ sendToServer = ($pad) ->
       oReq = new XMLHttpRequest();
       oReq.open("POST", syncUrl + "audio/" + padData.filename, true);
       oReq.setRequestHeader("Content-Type", "application/octet-stream")
+
       oReq.onload = (e) ->
+        # Whatever happened, reset the progress bar
+        $progress.hide()
+
         if not ((this.status == 200 || this.status == 304) && this.readyState == 4)
           # error
           deferred.reject()
@@ -114,12 +120,31 @@ sendToServer = ($pad) ->
         deferred.resolve()
         return
 
+      oReq.upload.addEventListener 'progress'
+      , (e) ->
+        $audioElement = $pad.find("audio")
+        audioElement = $audioElement[0]
+        return unless audioElement.paused
+
+        # This could possibly be tidied up, but since play events will
+        # hide the progress bar, this is easiest.
+        $progress.show()
+        $progress_bar = $pad.find(".progress .bar")
+        $progress_bar.addClass "bar-warning"
+
+        percent = (e.loaded / e.total) * 100
+        $progress_bar.css
+          width: percent + "%"
+      , false
+
       oReq.send(padData.file);
 
   return deferred.promise()
 
 getFromServer = ($pad, serverPad) ->
   deferred = $.Deferred()
+
+  $progress = $pad.find(".progress")
 
   page = impamp.pads.getPage $pad
   key  = impamp.pads.getKey  $pad
@@ -128,6 +153,9 @@ getFromServer = ($pad, serverPad) ->
   oReq.open("GET", syncUrl + "audio/#{serverPad.filename}", true);
   oReq.responseType = "blob";
   oReq.onload = (e) ->
+    # Whatever happened, reset the progress bar
+    $progress.hide()
+
     if not ((this.status == 200 || this.status == 304) && this.readyState == 4)
       # error
       deferred.reject()
@@ -140,6 +168,20 @@ getFromServer = ($pad, serverPad) ->
         deferred.resolve()
         return
       , serverPad.updatedAt
+
+  oReq.addEventListener 'progress'
+    , (e) ->
+      # This could possibly be tidied up, but since play events will
+      # hide the progress bar, this is easiest.
+      $progress.show()
+      $progress_bar = $pad.find(".progress .bar")
+      $progress_bar.addClass "bar-warning"
+
+      percent = (e.loaded / e.total) * 100
+      $progress_bar.css
+        width: percent + "%"
+    , false
+
   oReq.send();
 
   return deferred.promise()
