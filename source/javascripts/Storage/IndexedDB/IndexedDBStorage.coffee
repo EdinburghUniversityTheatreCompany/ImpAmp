@@ -51,6 +51,22 @@ class window.IndexedDBStorage
     request.onerror = (e) ->
       console.log e.value
 
+  setPadName: (page, key, name, callback, updatedAt = new Date().getTime()) ->
+    trans = @db.transaction(["pad"], "readwrite")
+    store = trans.objectStore("pad")
+    request = store.put(
+      page: page
+      key:  key
+      name: name
+      updatedAt: updatedAt
+    )
+
+    request.onsuccess = (e) ->
+      callback?()
+
+    request.onerror = (e) ->
+      console.log e.value
+
   removePad: (page, key, callback) ->
     trans = @db.transaction(["pad"], "readwrite")
     store = trans.objectStore("pad")

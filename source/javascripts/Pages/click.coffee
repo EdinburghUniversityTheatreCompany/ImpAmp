@@ -1,5 +1,8 @@
 $ ->
-  $('.page-nav [href^="#page"]').dblclick (e) ->
+  $('.page-nav [href^="#page"]').click (e) ->
+    return unless e.ctrlKey
+    e.preventDefault()
+
     $pageNav = $(e.currentTarget)
 
     $modal = $(nameChangeModal)
@@ -20,6 +23,8 @@ $ ->
           $modal.modal('hide')
 
       return false
+
+    return false
 
 nameChangeModal = """
 <div class="modal hide fade">

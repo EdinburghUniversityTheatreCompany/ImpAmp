@@ -71,6 +71,16 @@ class window.WebSQLStorage
           console.log error
     reader.readAsDataURL(file);
 
+  setPadName: (page, key, name, callback, updatedAt = new Date().getTime()) ->
+    @db.transaction (tx) ->
+      tx.executeSql """
+                    UPDATE Pads SET name = ?, updatedAt = ? WHERE page = ? AND key = ?
+                    """
+      , [name, updatedAt, page, key],
+        callback?()
+      , (tx, error) ->
+        console.log error
+
   removePad: (page, key, callback) ->
     @db.transaction (tx) ->
       tx.executeSql "DELETE FROM Pads WHERE page=? AND key=?"
