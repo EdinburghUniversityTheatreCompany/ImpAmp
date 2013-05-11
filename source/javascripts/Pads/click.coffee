@@ -8,15 +8,24 @@ $ ->
     if e.ctrlKey
       renamePad($pad)
     else
-      playPad($pad)
+      playPausePad($pad)
 
     return false
 
-playPad = ($pad) ->
+playPausePad = ($pad) ->
+  audio = $pad.find("audio")[0]
   $progress = $pad.find(".progress")
-  $progress.show()
 
-  $pad.find("audio")[0].play()
+  if audio.paused
+    $progress.show()
+
+    audio.play()
+  else
+    # Playing. Stop and reset
+    audio.pause()
+    audio.currentTime = 0
+
+    $progress.hide()
 
 renamePad = ($pad) ->
   $modal = $(nameChangeModal)
