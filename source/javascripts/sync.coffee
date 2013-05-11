@@ -1,13 +1,17 @@
-impamp.sync = {}
-syncUrl = impamp.sync.url = location.protocol + "//" + location.host + "/"
-syncEnabled = true
+impamp.sync    = {}
+syncUrl        = impamp.sync.url = location.protocol + "//" + location.host + "/"
+syncEnabled    = true
+syncInProgress = false
 
 sync = ->
   if not syncUrl?
     setSyncButton("exclamation-sign", "SyncUrl not set")
     return
-  return unless syncEnabled
 
+  return unless syncEnabled
+  return if syncInProgress
+
+  syncInProgress = true
   setSyncButton("refresh icon-spin", "Synchronising")
 
   $.ajax
@@ -50,10 +54,13 @@ sync = ->
 
       syncWait = $.when.apply($, updates)
       syncWait.done ->
+        syncInProgress = false
         setSyncButton("ok", "Sync Complete")
       syncWait.fail ->
+        syncInProgress = false
         setSyncButton("exclamation-sign", "Sync Error")
     error: ->
+      syncInProgress = false
       setSyncButton("exclamation-sign", "Sync Error")
 
 # Should return a jQuery promise.
