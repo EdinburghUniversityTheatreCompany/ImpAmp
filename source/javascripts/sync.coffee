@@ -1,21 +1,24 @@
-impamp.sync    = {}
-syncUrl        = impamp.sync.url = location.protocol + "//" + location.host + "/"
-syncEnabled    = true
+config         = {}
+config.url     = location.protocol + "//" + location.host + "/"
+config.enabled = true
+
+impamp.sync = config
+
 syncInProgress = false
 
 sync = ->
-  if not syncUrl?
+  if not config.url?
     setSyncButton("exclamation-sign", "SyncUrl not set")
     return
 
-  return unless syncEnabled
+  return unless config.enabled
   return if syncInProgress
 
   syncInProgress = true
   setSyncButton("refresh icon-spin", "Synchronising")
 
   $.ajax
-    url: syncUrl + "impamp_server.json",
+    url: config.url + "impamp_server.json",
     type: "GET",
     xhrFields:
       withCredentials: true
@@ -94,7 +97,7 @@ sendToServer = ($pad) ->
 
       # First, upload the file
       oReq = new XMLHttpRequest();
-      oReq.open("POST", syncUrl + "audio/" + padData.filename, true);
+      oReq.open("POST", config.url + "audio/" + padData.filename, true);
       oReq.setRequestHeader("Content-Type", "application/octet-stream")
 
       oReq.onload = (e) ->
@@ -111,7 +114,7 @@ sendToServer = ($pad) ->
 
         # Then send the padData
         $.ajax
-          url:  syncUrl + "pad/#{padData.page}/#{padData.key}"
+          url:  config.url + "pad/#{padData.page}/#{padData.key}"
           type: "POST"
           data: padData
           error: ->
@@ -150,7 +153,7 @@ getFromServer = ($pad, serverPad) ->
   key  = impamp.pads.getKey  $pad
 
   oReq = new XMLHttpRequest();
-  oReq.open("GET", syncUrl + "audio/#{serverPad.filename}", true);
+  oReq.open("GET", config.url + "audio/#{serverPad.filename}", true);
   oReq.responseType = "blob";
   oReq.onload = (e) ->
     # Whatever happened, reset the progress bar
@@ -189,7 +192,7 @@ getFromServer = ($pad, serverPad) ->
 impamp.sync.deletePad = deletePad = (page, key) ->
   $.ajax
     type: "DELETE",
-    url:  syncUrl + "pad/#{page}/#{key}"
+    url:  config.url + "pad/#{page}/#{key}"
 
 # Should return a jQuery promise.
 updatePage = ($pageNav, serverPage) ->
@@ -219,7 +222,7 @@ sendPageToServer = ($pageNav) ->
     storage.getPage pageNo, (pageData) ->
 
       $.ajax
-        url:  syncUrl + "page/#{pageNo}"
+        url:  config.url + "page/#{pageNo}"
         type: "POST"
         data: pageData
         error: ->
@@ -233,16 +236,16 @@ sendPageToServer = ($pageNav) ->
 $ ->
   $('#syncBtn').click (e) ->
     $btn = $(e.currentTarget)
-    if $btn.data('sync-enabled') == true
-      syncEnabled = false
+    if $btn.data('config.enabled') == true
+      config.enabled = false
       setSyncButton("remove-sign", "Sync Disabled")
-      $btn.data('sync-enabled', false)
+      $btn.data('config.enabled', false)
     else
-      syncEnabled = true
+      config.enabled = true
       setSyncButton("time", "Waiting for Sync")
-      $btn.data('sync-enabled', true)
+      $btn.data('config.enabled', true)
 
-setSyncButton = (icon, text) ->
+impamp.setSyncButton = setSyncButton = (icon, text) ->
   $('#syncBtn').html """
   <i class="icon-#{icon}"></i> #{text}
                      """
