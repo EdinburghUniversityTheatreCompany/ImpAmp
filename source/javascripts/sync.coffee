@@ -236,7 +236,7 @@ sendPageToServer = ($pageNav) ->
 $ ->
   $('#syncBtn').click (e) ->
     $btn = $(e.currentTarget)
-    if $btn.data('config.enabled') == true
+    if config.enabled == true
       config.enabled = false
       setSyncButton("remove-sign", "Sync Disabled")
       $btn.data('config.enabled', false)

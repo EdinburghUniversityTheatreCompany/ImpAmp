@@ -11,5 +11,6 @@ appCache.addEventListener 'downloading'
 
 appCache.addEventListener 'updateready'
   , ->
+    appCache.swapCache()
     impamp.setSyncButton "remove-sign", "Updates Ready. Please refresh page to enable sync."
   , false
