@@ -16,6 +16,8 @@ class ImpAmpServer < Sinatra::Base
   end
 
   post '/pad/:page_no/:key' do |page_no, key|
+    key = "." if key == "period"
+
     data = JSON.parse( IO.read('impamp_server.json') )
 
     pages = data["pages"]
@@ -38,6 +40,8 @@ class ImpAmpServer < Sinatra::Base
   end
 
   delete '/pad/:page_no/:key' do |page_no, key|
+    key = "." if key == "period"
+
     data = JSON.parse( IO.read('impamp_server.json') )
 
     pages = data["pages"]

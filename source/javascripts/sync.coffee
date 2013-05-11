@@ -114,7 +114,7 @@ sendToServer = ($pad) ->
 
         # Then send the padData
         $.ajax
-          url:  config.url + "pad/#{padData.page}/#{padData.key}"
+          url:  config.url + "pad/#{padData.page}/#{keyURI(padData.key)}"
           type: "POST"
           data: padData
           error: ->
@@ -192,7 +192,7 @@ getFromServer = ($pad, serverPad) ->
 impamp.sync.deletePad = deletePad = (page, key) ->
   $.ajax
     type: "DELETE",
-    url:  config.url + "pad/#{page}/#{key}"
+    url:  config.url + "pad/#{page}/#{keyURI(key)}"
 
 # Should return a jQuery promise.
 updatePage = ($pageNav, serverPage) ->
@@ -232,6 +232,13 @@ sendPageToServer = ($pageNav) ->
       return
 
   return deferred.promise()
+
+keyURI = (key) ->
+  # Bit nasty. But it works...
+  if key == "."
+    return "period"
+
+  return encodeURIComponent(key)
 
 $ ->
   $('#syncBtn').click (e) ->
