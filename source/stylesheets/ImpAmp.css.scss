@@ -75,13 +75,19 @@ body {
 
   &.disabled {
     .btn {
-      @extend .disabled
+      @extend .disabled;
     }
   }
 
   &.error {
     .btn {
       @extend .btn-danger;
+    }
+  }
+
+  &.hover {
+    .btn {
+      @extend .btn-primary;
     }
   }
 
