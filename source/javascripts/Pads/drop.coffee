@@ -1,4 +1,14 @@
 $ ->
+
+  # prevent browser from opening the file if we missed a pad.
+  $(window).on "dragover", (e) ->
+    e.preventDefault()
+    return false
+  $(window).on "drop", (e) ->
+    e.stopPropagation()
+    e.preventDefault()
+    return false
+
   $('.pad').each (i, pad) ->
     $pad = $(pad)
 
