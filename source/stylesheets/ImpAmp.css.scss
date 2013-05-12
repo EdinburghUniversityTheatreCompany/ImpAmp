@@ -32,6 +32,19 @@ body {
   margin-top: 100px;
 }
 
+footer {
+  position: absolute;
+  bottom:   10px;
+  left:     10px;
+
+  p {
+    color: $gray;
+    margin: 0;
+    line-height: normal;
+    font-size: small;
+  }
+}
+
 .modal-header h3 {
   color: #333333;
 }

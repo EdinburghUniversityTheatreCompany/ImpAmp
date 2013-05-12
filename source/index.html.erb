@@ -39,11 +39,13 @@
         <div id="pad-pages" class="tab-content">
           <% for i in pages %>
             <div class="tab-pane pad-page <%= "active" if i == 1 %>" id="page_<%= i %>">
-              <%= partial 'page',       locals: { shortcut: i } %>
+              <%= partial 'page', locals: { shortcut: i } %>
             </div>
           <% end %>
         </div>
       </div>
     </div>
+
+    <%= partial 'footer' %>
   </body>
 </html>

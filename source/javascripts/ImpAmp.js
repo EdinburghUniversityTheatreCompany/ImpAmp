@@ -13,3 +13,4 @@
 //= require_tree ./Pads
 //= require keyboard
 //= require sync
+//= require version
