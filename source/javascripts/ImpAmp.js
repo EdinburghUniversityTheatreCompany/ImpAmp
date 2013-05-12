@@ -3,7 +3,7 @@
 //= require bootstrap
 //= require modernizr
 //= require appCache
-//= require FeatureDetection/FeatureDetection
+//= require_tree ./FeatureDetection
 //= require Storage/utils
 //= require Storage/IndexedDB/_IndexedDB
 //= require Storage/WebSQL/_WebSQL
