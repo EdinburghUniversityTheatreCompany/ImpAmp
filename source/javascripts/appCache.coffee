@@ -3,7 +3,7 @@ appCache = window.applicationCache
 appCache.addEventListener 'downloading'
   , ->
     impamp.sync.enabled   = false
-    impamp.setSyncButton "remove-sign", "Updating ImpAmp..."
+    impamp.setSyncButton "info-sign", "Updating ImpAmp..."
   , false
 
 # After first cache
