@@ -1,3 +1,4 @@
+//= require header
 //= require jquery-2.0.0
 //= require setup
 //= require bootstrap
