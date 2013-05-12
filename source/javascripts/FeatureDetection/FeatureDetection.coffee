@@ -36,6 +36,14 @@ testIDBBlobSupport = (callback) ->
         db.close()
         indexedDB.deleteDatabase dbname
 
+if not Modernizr.audio
+  # It won't work. End of.
+  featureDetection.reject()
+
+if `Modernizr.audio.mp3 == false`
+  $ ->
+    $('#noMp3Warn').show();
+
 if Modernizr.websqldatabase
   availableStorageTypes.push impamp.storageTypes.WEB_SQL
 
