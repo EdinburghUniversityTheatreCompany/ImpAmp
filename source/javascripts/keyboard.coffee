@@ -18,14 +18,14 @@ addNavHandlers = ->
   $('.page-nav a[data-shortcut]').each (i, item) ->
     $item = $(item)
     shortcut = $item.data('shortcut')
-    keycode = shortcut.toString().charCodeAt(0)
+    charcode = shortcut.toString().charCodeAt(0)
 
     $item.click ->
       page = $($item.attr('href'))
       addPageHandlers(page)
 
     $body.on 'keydown', (e) ->
-      return unless e.keyCode == keycode
+      return unless getCharCode(e.keyCode) == charcode
 
       $item.click()
       return
