@@ -186,3 +186,11 @@ footer {
   border: 1px solid rgba(226, 107, 24, 1);
   border-bottom-color: transparent;
 }
+
+.fade-out .progress .bar {
+  -webkit-transition: none;
+     -moz-transition: none;
+      -ms-transition: none;
+       -o-transition: none;
+          transition: none;
+}

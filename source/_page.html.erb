@@ -10,11 +10,15 @@
           </a>
         </div>
       <% when "space" %>
-        <div class="padish span1">
+        <div class="padish span1 fade-out">
           <a class="btn" data-shortcut="<%= key %>">
             <span class="name">
               Fade Out All
             </span>
+
+            <div class="progress" style="display: none;">
+              <div class="bar"></div>
+            </div>
           </a>
         </div>
       <% else %>
