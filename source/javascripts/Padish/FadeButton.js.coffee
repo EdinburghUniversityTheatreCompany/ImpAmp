@@ -8,6 +8,8 @@ $ ->
     $progress_bar.css
       width: 0
 
+    $progress_text = $progress.find("span")
+
     $('audio').each (i, elem) ->
       return if elem.paused
 
@@ -20,6 +22,8 @@ $ ->
         progress: (animation, progress) ->
           $progress_bar.css
             width: (progress * 100) + "%"
+
+          $progress_text.text(Math.round(3 - 3 * progress))
         complete: ->
           elem.pause()
           elem.currentTime = 0

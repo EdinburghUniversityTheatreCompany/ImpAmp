@@ -45,9 +45,13 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
       $progress_bar = $pad.find(".progress .bar")
       $progress_bar.removeClass "bar-warning"
 
+      $progress_text = $pad.find(".progress > span")
+
       percent = (audioElement.currentTime / audioElement.duration) * 100
       $progress_bar.css
         width: percent + "%"
+
+      $progress_text.text(Math.round(audioElement.duration - audioElement.currentTime))
 
     $audioElement.on 'ended', (e) ->
       $progress = $pad.find(".progress")
