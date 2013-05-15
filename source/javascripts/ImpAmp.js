@@ -4,6 +4,7 @@
 //= require bootstrap
 //= require modernizr
 //= require appCache
+//= require modals
 //= require_tree ./FeatureDetection
 //= require Storage/utils
 //= require Storage/IndexedDB/_IndexedDB

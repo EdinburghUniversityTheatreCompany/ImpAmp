@@ -2,13 +2,9 @@ fs = impamp.filesystem
 
 $ ->
   $("#importBtn").click ->
-    $modal = $(importModal)
-    $('body').append($modal)
-    $modal.modal('show')
-    $modal.on 'hidden', ->
-      $modal.remove()
+    $modal = importModal()
 
-    $('#modalImportButton').click ->
+    $modal.find('.modal-confirm').click ->
       $file_input = $modal.find("input[type='file']")
       file = $file_input[0].files[0]
 
@@ -32,21 +28,13 @@ $ ->
           return
 
 
-importModal = """
-<div class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>Import Pads from File</h3>
-  </div>
-  <div class="modal-body">
-    <input type="file" accept=".iajson">
-    <div class="progress">
-      <div class="bar"></div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn"  data-dismiss="modal"             >Cancel</a>
-    <a href="#" class="btn btn-primary" id="modalImportButton">Import</a>
-  </div>
-</div>
-"""
+importModal = ->
+  title = "Import Pads from File"
+  body  = """
+          <input type="file" accept=".iajson">
+          <div class="progress">
+            <div class="bar"></div>
+          </div>
+          """
+
+  return impamp.showModal(title, body, "Import")

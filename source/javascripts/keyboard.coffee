@@ -1,7 +1,8 @@
 
-activeHandlers = []
+activeHandlers    = []
+activeNavHandlers = []
 
-addNavHandlers = ->
+impamp.addNavHandlers = addNavHandlers = ->
   $body = $('body')
 
   $('.page-nav a[data-shortcut]').each (i, item) ->
@@ -13,19 +14,23 @@ addNavHandlers = ->
       $page = $($item.attr('href'))
       addPageHandlers($page)
 
-    $body.on 'keydown', (e) ->
+    navHandler = (e) ->
       return unless getCharCode(e.keyCode) == charcode
 
       $item.click()
-      return
+
+    $body.on 'keydown', navHandler
+    activeNavHandlers.push navHandler
     return
 
-impamp.addPageHandlers = addPageHandlers = ($page) ->
-  $body = $('body')
+impamp.removeNavHandlers = removeNavHandlers = ->
+  $.each activeNavHandlers, (i, handler) ->
+    $('body').off('keydown', handler)
 
-  oldHandlers = activeHandlers
-  $.each oldHandlers, (i, handler) ->
-    $body.off('keydown', handler)
+impamp.addPageHandlers = addPageHandlers = ($page) ->
+  removePageHandlers()
+
+  $body = $('body')
 
   children = $page.find(".pad .btn")
   children.each (i, child) ->
@@ -56,6 +61,10 @@ impamp.addPageHandlers = addPageHandlers = ($page) ->
   activeHandlers.push spaceHandler
 
   return
+
+impamp.removePageHandlers = removePageHandlers = ->
+  $.each activeHandlers, (i, handler) ->
+    $('body').off('keydown', handler)
 
 getCharCode = (keycode) ->
   # See http://unixpapa.com/js/key.html
