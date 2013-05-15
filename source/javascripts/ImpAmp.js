@@ -12,6 +12,7 @@
 //= require Storage/import
 //= require_tree ./Pages
 //= require_tree ./Pads
+//= require_tree ./Padish
 //= require keyboard
 //= require sync
 //= require version

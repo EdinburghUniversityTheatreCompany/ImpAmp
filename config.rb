@@ -49,7 +49,7 @@ set :images_dir, 'images'
 
 set :layout, false
 
-set :keyboard, ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "#", "\\", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"]
+set :keyboard, ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "esc", "\\", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", "space"]
 
 # Build-specific configuration
 configure :build do

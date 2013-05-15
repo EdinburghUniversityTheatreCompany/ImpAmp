@@ -60,14 +60,9 @@ footer {
   */
 }
 
-.pad {
+.padish {
   position: relative;
   margin-bottom: 20px;
-
-  /* Hide these error messages - we'll deal with it ourselves thanks. */
-  .me-cannotplay {
-    display: none;
-  }
 
   .btn {
     width: 100%;
@@ -84,6 +79,15 @@ footer {
     bottom: 0.5em;
     left:  10px;
     right: 10px;
+  }
+}
+
+.pad {
+  @extend .padish;
+
+  /* Hide these error messages - we'll deal with it ourselves thanks. */
+  .me-cannotplay {
+    display: none;
   }
 
   &.disabled {

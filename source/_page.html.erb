@@ -1,20 +1,34 @@
 <div class="row">
   <% for key in settings.keyboard %>
-    <% if key == "#" %>
-      <div class="span1" style="height: 90px;">
-      </div>
-    <% else %>
-      <div class="pad span1 disabled">
-        <a class="btn" data-shortcut="<%= key %>">
-          <span class="name"></span>
+    <% case key %>
+      <% when "esc" %>
+        <div class="padish span1">
+          <a class="btn" data-shortcut="<%= key %>">
+            <span class="name">
+              Stop All
+            </span>
+          </a>
+        </div>
+      <% when "space" %>
+        <div class="padish span1">
+          <a class="btn" data-shortcut="<%= key %>">
+            <span class="name">
+              Fade Out All
+            </span>
+          </a>
+        </div>
+      <% else %>
+        <div class="pad span1 disabled">
+          <a class="btn" data-shortcut="<%= key %>">
+            <span class="name"></span>
 
-          <audio></audio>
+            <audio></audio>
 
-          <div class="progress" style="display: none;">
-            <div class="bar"></div>
-          </div>
-        </a>
-      </div>
+            <div class="progress" style="display: none;">
+              <div class="bar"></div>
+            </div>
+          </a>
+        </div>
     <% end %>
   <% end %>
 </div>
