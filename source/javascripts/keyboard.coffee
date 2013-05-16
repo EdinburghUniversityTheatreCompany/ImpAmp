@@ -1,5 +1,5 @@
 
-activeHandlers    = []
+activePadishKeyHandlers    = []
 activeNavHandlers = []
 
 impamp.addNavHandlers = addNavHandlers = ->
@@ -28,7 +28,7 @@ impamp.removeNavHandlers = removeNavHandlers = ->
     $('body').off('keydown', handler)
 
 impamp.addPageHandlers = addPageHandlers = ($page) ->
-  removePageHandlers()
+  removePadishKeyHandlers()
 
   $body = $('body')
 
@@ -44,7 +44,7 @@ impamp.addPageHandlers = addPageHandlers = ($page) ->
       $child.click()
 
     $body.on 'keydown', handler
-    activeHandlers.push handler
+    activePadishKeyHandlers.push handler
 
   escapeHandler = (e) ->
     return unless e.keyCode == 27
@@ -57,14 +57,16 @@ impamp.addPageHandlers = addPageHandlers = ($page) ->
   $body.on 'keydown', escapeHandler
   $body.on 'keydown', spaceHandler
 
-  activeHandlers.push escapeHandler
-  activeHandlers.push spaceHandler
+  activePadishKeyHandlers.push escapeHandler
+  activePadishKeyHandlers.push spaceHandler
 
   return
 
-impamp.removePageHandlers = removePageHandlers = ->
-  $.each activeHandlers, (i, handler) ->
+impamp.removePadishKeyHandlers = removePadishKeyHandlers = ->
+  $.each activePadishKeyHandlers, (i, handler) ->
     $('body').off('keydown', handler)
+
+  activePadishKeyHandlers = []
 
 getCharCode = (keycode) ->
   # See http://unixpapa.com/js/key.html

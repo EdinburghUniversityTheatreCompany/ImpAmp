@@ -24,7 +24,7 @@ impamp.showModal = (title, body, confirmText = "Confirm", actions = true, backdr
 
   $modal.on 'show', ->
     impamp.removeNavHandlers()
-    impamp.removePageHandlers()
+    impamp.removePadishKeyHandlers()
 
   $modal.on 'hidden', ->
     $modal.remove()
