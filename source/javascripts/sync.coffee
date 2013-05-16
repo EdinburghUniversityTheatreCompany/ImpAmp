@@ -238,6 +238,9 @@ keyURI = (key) ->
   if key == "."
     return "period"
 
+  if key == "/"
+    return "slash"
+
   return encodeURIComponent(key)
 
 $ ->
