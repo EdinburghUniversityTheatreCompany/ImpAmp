@@ -10,11 +10,14 @@ $ ->
 
     $progress_text = $progress.find("span")
 
+    fading = false
+
     $('audio').each (i, elem) ->
       return if elem.paused
 
-      $elem = $(elem)
+      fading = true
 
+      $elem = $(elem)
       $elem.animate
         volume: 0
       ,
@@ -32,3 +35,6 @@ $ ->
           $pad.find(".progress").hide()
 
           $progress.hide()
+
+    if fading == false
+      $progress.hide()
