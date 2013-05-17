@@ -10,7 +10,7 @@ class window.IndexedDBStorage
       @db = e.target.result
       impamp.storage.resolve this
     request.onerror = (e) ->
-      console.log e
+      throw e
 
     request.onupgradeneeded = (e) =>
       db = e.target.result;
@@ -43,11 +43,17 @@ class window.IndexedDBStorage
   # @param updatedAt Note that this parameter (which defaults to the current time) will
   #                  override any updatedAt passed in padData.
   setPad: (page, key, padData, callback, updatedAt = new Date().getTime()) ->
-    padData.updatedAt = updatedAt
-    padData.page ||= page
-    padData.key  ||= key
+    @getPad page, key, (oldPadData) =>
+      for column in impamp.padColumns
+        padData[column] = impamp.getValue(column, padData, oldPadData)
 
-    updateDB = =>
+      padData.updatedAt = updatedAt
+      padData.page ||= page
+      padData.key  ||= key
+
+      if (padData.page != page) || (padData.key != key)
+        @removePad(page, key)
+
       trans = @db.transaction(["pad"], "readwrite")
       store = trans.objectStore("pad")
 
@@ -56,28 +62,7 @@ class window.IndexedDBStorage
         callback?()
 
       request.onerror = (e) ->
-        console.log e.value
-
-    if (padData.page == page) && (padData.key == key)
-      # Just update the DB
-      updateDB()
-
-    else
-      # We're moving the pad. Load the old pad data, get rid of it and
-      # set the new one
-
-      @getPad page, key, (oldPadData) =>
-        newPage = padData.page
-        newKey  = padData.key
-
-        padData = oldPadData
-
-        padData.page = newPage
-        padData.key  = newKey
-
-        @removePad(page, key)
-
-        updateDB()
+        throw e
 
   removePad: (page, key, callback) ->
     trans = @db.transaction(["pad"], "readwrite")
@@ -95,18 +80,22 @@ class window.IndexedDBStorage
   # @param updatedAt Note that this parameter (which defaults to the current time) will
   #                  override any updatedAt passed in padData.
   setPage: (pageNo, pageData, callback, updatedAt = new Date().getTime()) ->
-    trans = @db.transaction(["page"], "readwrite")
-    store = trans.objectStore("page")
+    getPage pageNo, (oldPageData) =>
+      trans = @db.transaction(["page"], "readwrite")
+      store = trans.objectStore("page")
 
-    pageData.updatedAt = updatedAt
-    pageData.pageNo ||= pageNo
+      pageData.updatedAt = updatedAt
+      pageData.pageNo ||= pageNo
 
-    request = store.put(pageData)
-    request.onsuccess = (e) ->
-      callback?()
+      for column in impamp.pageColumns
+        pageData[column] = impamp.getValue(column, pageData, oldPageData)
 
-    request.onerror = (e) ->
-      console.log e.value
+      request = store.put(pageData)
+      request.onsuccess = (e) ->
+        callback?()
+
+      request.onerror = (e) ->
+        throw e
 
   getPage: (pageNo, callback) ->
     trans = @db.transaction(["page"], "readwrite")
@@ -168,7 +157,7 @@ class window.IndexedDBStorage
           return
         reader.onerror = (e) ->
           deferred.reject()
-          console.log e
+          throw e
           return
         reader.readAsDataURL(pad.file);
 

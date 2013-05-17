@@ -21,3 +21,31 @@ impamp.convertDataURIToBlob = (dataURI) ->
     uInt8Array[i] = raw.charCodeAt(i)
     ++i
   new Blob([uInt8Array.buffer])
+
+#
+# Compares newData and oldData to get the correct value.
+# This allows "null" in newPadData to override an existing value
+# in oldPadData
+#
+impamp.getValue = (property, newData, oldData) ->
+  if property of newData
+    return newData[property]
+  else
+    return (oldData || {})[property]
+
+impamp.padColumns =
+  [
+    "page"
+    "key"
+    "name"
+    "file"
+    "filename"
+    "filesize"
+    "updatedAt"
+  ]
+impamp.pageColumns =
+  [
+    "pageNo"
+    "name"
+    "updatedAt"
+  ]

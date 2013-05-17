@@ -1,19 +1,5 @@
 class window.WebSQLStorage
-  @db: null;
-  @padColumns:  [
-                "page"
-                "key"
-                "name"
-                "file"
-                "filename"
-                "filesize"
-                "updatedAt"
-                ]
-  @pageColumns: [
-                "pageNo"
-                "name"
-                "updatedAt"
-                ]
+  @db: null
 
   @rowToPad: (row) ->
     data =
@@ -88,25 +74,13 @@ class window.WebSQLStorage
   #                  override any updatedAt passed in padData.
   setPad: (page, key, padData, callback, updatedAt = new Date().getTime()) ->
     for column, value of padData
-      if not column in WebSQLStorage.padColumns
-        console.warn "#{column} is not supported in WebSQLStorage."
+      if not column in impamp.padColumns
         delete padData[column]
 
     updateDB = =>
-      #
-      # Compares newPadData and oldPadData to get the correct value.
-      # This allows "null" in newPadData to override an existing value
-      # in oldPadData
-      #
-      getValue = (property, newPadData, oldPadData) ->
-        if property of newPadData
-          return newPadData[property]
-        else
-          return (oldPadData || {})[property]
-
       @getPadRow page, key, (oldPadData) =>
-        for column in WebSQLStorage.padColumns
-          padData[column] = getValue(column, padData, oldPadData)
+        for column in impamp.padColumns
+          padData[column] = impamp.getValue(column, padData, oldPadData)
 
         padData.page ||= page
         padData.key  ||= key
@@ -154,8 +128,7 @@ class window.WebSQLStorage
   #                  override any updatedAt passed in padData.
   setPage: (pageNo, pageData, callback, updatedAt = new Date().getTime()) ->
     for column, value of pageData
-      if not column in WebSQLStorage.pageColumns
-        console.warn "#{column} is not supported in WebSQLStorage."
+      if not column in impamp.pageColumns
         delete pageData[column]
 
     #
@@ -163,15 +136,9 @@ class window.WebSQLStorage
     # This allows "null" in newPageData to override an existing value
     # in oldPageData
     #
-    getValue = (property, newPageData, oldPageData) ->
-      if property of newPageData
-        return newPageData[property]
-      else
-        return (oldPageData || {})[property]
-
     @getPage page, key, (oldPageData) =>
-      for column in WebSQLStorage.pageColumns
-        pageData[column] = getValue(column, pageData, oldPageData)
+      for column in impamp.pageColumns
+        pageData[column] = impamp.getValue(column, pageData, oldPageData)
 
       pageData.pageNo ||= pageNo
 
@@ -253,7 +220,7 @@ class window.WebSQLStorage
                 , ->
                   deferred.resolve()
                 , (tx, error) ->
-                  console.log error
+                  throw error
       waiting  = $.when.apply(null, transactions)
       complete = 0
       waiting.then ->
