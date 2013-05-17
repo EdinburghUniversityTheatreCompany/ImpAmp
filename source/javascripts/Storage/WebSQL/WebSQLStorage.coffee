@@ -136,7 +136,7 @@ class window.WebSQLStorage
     # This allows "null" in newPageData to override an existing value
     # in oldPageData
     #
-    @getPage page, key, (oldPageData) =>
+    @getPage pageNo, (oldPageData) =>
       for column in impamp.pageColumns
         pageData[column] = impamp.getValue(column, pageData, oldPageData)
 
