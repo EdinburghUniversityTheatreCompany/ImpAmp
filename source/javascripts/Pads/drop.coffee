@@ -49,10 +49,14 @@ $ ->
 setPadFile = ($pad, file) ->
   page = impamp.pads.getPage $pad
   key  = impamp.pads.getKey  $pad
-  name = file.name
 
   impamp.storage.done (storage) ->
-    storage.setPad page, key, name, file, file.name, file.size, ->
+    storage.setPad page, key,
+      name: file.name
+      file: file
+      filename: file.name
+      filesize: file.size
+    , ->
       impamp.loadPad($pad)
 
 movePad = ($new_pad, ia_move_data) ->
@@ -69,11 +73,14 @@ movePad = ($new_pad, ia_move_data) ->
   new_key  = impamp.pads.getKey  $new_pad
 
   impamp.storage.done (storage) ->
-    storage.getPad old_page, old_key, (padData) ->
-      storage.setPad new_page, new_key, padData.name, padData.file, padData.filename, padData.filesize, ->
+    # First, get rid if there is a pad there already.
+    storage.removePad new_page, new_key, ->
+      # Then update the pad.
+      storage.setPad old_page, old_key,
+        page: new_page
+        key:  new_key
+      , ->
         impamp.sync.deletePad old_page, old_key
-        storage.removePad old_page, old_key, ->
-          impamp.loadPad($old_pad)
-
+        impamp.loadPad($old_pad)
         impamp.loadPad($new_pad)
 

@@ -39,7 +39,7 @@ renamePad = ($pad) ->
     key  = impamp.pads.getKey  $pad
 
     impamp.storage.done (storage) ->
-      storage.setPadName page, key, newName, ->
+      storage.setPad page, key, { name: newName }, ->
         impamp.loadPad($pad)
         $modal.modal('hide')
 

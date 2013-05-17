@@ -13,7 +13,7 @@ $ ->
       newName = $('#renameInput').val()
 
       impamp.storage.done (storage) ->
-        storage.setPage impamp.pages.getPageNo($pageNav), newName, ->
+        storage.setPage impamp.pages.getPageNo($pageNav), { name: newName }, ->
           impamp.loadPage($pageNav)
           $modal.modal('hide')
 

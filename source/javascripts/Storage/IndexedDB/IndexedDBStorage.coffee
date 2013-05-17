@@ -33,39 +33,51 @@ class window.IndexedDBStorage
       callback e.target.result
 
 
-  setPad: (page, key, name, file, filename, filesize, callback, updatedAt = new Date().getTime()) ->
-    trans = @db.transaction(["pad"], "readwrite")
-    store = trans.objectStore("pad")
-    request = store.put(
-      page: page
-      key:  key
-      name: name
-      file: file
-      filename:  filename
-      filesize:  filesize
-      updatedAt: updatedAt
-    )
-    request.onsuccess = (e) ->
-      callback?()
+  #
+  # Create or update a pad
+  # @param page      The current page of the pad to update, or page to create a pad on
+  # @param key       The current key of the pad to update, or key to create a pad on
+  # @param padData   The new data to use. When updating, existing values will be used if
+  #                  they are not specified.
+  # @param callback  A function with no arguments to call when the pad has been set.
+  # @param updatedAt Note that this parameter (which defaults to the current time) will
+  #                  override any updatedAt passed in padData.
+  setPad: (page, key, padData, callback, updatedAt = new Date().getTime()) ->
+    padData.updatedAt = updatedAt
+    padData.page ||= page
+    padData.key  ||= key
 
-    request.onerror = (e) ->
-      console.log e.value
+    updateDB = =>
+      trans = @db.transaction(["pad"], "readwrite")
+      store = trans.objectStore("pad")
 
-  setPadName: (page, key, name, callback, updatedAt = new Date().getTime()) ->
-    trans = @db.transaction(["pad"], "readwrite")
-    store = trans.objectStore("pad")
-    request = store.put(
-      page: page
-      key:  key
-      name: name
-      updatedAt: updatedAt
-    )
+      request = store.put(padData)
+      request.onsuccess = (e) ->
+        callback?()
 
-    request.onsuccess = (e) ->
-      callback?()
+      request.onerror = (e) ->
+        console.log e.value
 
-    request.onerror = (e) ->
-      console.log e.value
+    if (padData.page == page) && (padData.key == key)
+      # Just update the DB
+      updateDB()
+
+    else
+      # We're moving the pad. Load the old pad data, get rid of it and
+      # set the new one
+
+      @getPad page, key, (oldPadData) =>
+        newPage = padData.page
+        newKey  = padData.key
+
+        padData = oldPadData
+
+        padData.page = newPage
+        padData.key  = newKey
+
+        @removePad(page, key)
+
+        updateDB()
 
   removePad: (page, key, callback) ->
     trans = @db.transaction(["pad"], "readwrite")
@@ -74,14 +86,22 @@ class window.IndexedDBStorage
     request.onsuccess = ->
       callback?()
 
-  setPage: (pageNo, name, callback, updatedAt = new Date().getTime()) ->
+  #
+  # Create or update a page in the database.
+  # @param pageNo    The number of the page
+  # @param pageData  The new data to use. When updating, existing values will be used if
+  #                  they are not specified.
+  # @param callback  A function with no arguments to call when the pad has been set.
+  # @param updatedAt Note that this parameter (which defaults to the current time) will
+  #                  override any updatedAt passed in padData.
+  setPage: (pageNo, pageData, callback, updatedAt = new Date().getTime()) ->
     trans = @db.transaction(["page"], "readwrite")
     store = trans.objectStore("page")
-    request = store.put
-      pageNo:    pageNo
-      name:      name
-      updatedAt: updatedAt
 
+    pageData.updatedAt = updatedAt
+    pageData.pageNo ||= pageNo
+
+    request = store.put(pageData)
     request.onsuccess = (e) ->
       callback?()
 

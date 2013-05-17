@@ -164,9 +164,10 @@ getFromServer = ($pad, serverPad) ->
       deferred.reject()
       return
 
-    blob = oReq.response
+    serverPad.file = oReq.response
+
     impamp.storage.done (storage) ->
-      storage.setPad page, key, serverPad.name, blob, serverPad.filename, serverPad.filesize, ->
+      storage.setPad page, key, serverPad, ->
         impamp.loadPad($pad, storage)
         deferred.resolve()
         return
@@ -206,7 +207,7 @@ updatePage = ($pageNav, serverPage) ->
     impamp.storage.done (storage) ->
       pageNo = impamp.pages.getPageNo $pageNav
 
-      storage.setPage pageNo, serverPage.name, ->
+      storage.setPage pageNo, serverPage, ->
         impamp.loadPage($pageNav)
         deferred.resolve()
       , serverPage.updatedAt

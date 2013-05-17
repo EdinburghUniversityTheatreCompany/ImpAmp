@@ -1,14 +1,28 @@
 class window.WebSQLStorage
   @db: null;
+  @padColumns:  [
+                "page"
+                "key"
+                "name"
+                "file"
+                "filename"
+                "filesize"
+                "updatedAt"
+                ]
+  @pageColumns: [
+                "pageNo"
+                "name"
+                "updatedAt"
+                ]
 
   @rowToPad: (row) ->
     data =
       page: row.page
       key:  row.key
       name: row.name
+      file: impamp.convertDataURIToBlob row.file
       filename: row.filename
       filesize: row.filesize
-      file: impamp.convertDataURIToBlob row.file
       updatedAt: row.updatedAt
     return data
 
@@ -46,7 +60,13 @@ class window.WebSQLStorage
       impamp.storage.resolve me
 
   getPad: (page, key, callback) ->
-    rowToPad = @rowToPad
+    @getPadRow page, key, (row) ->
+      if row?
+        callback WebSQLStorage.rowToPad(row)
+      else
+        callback null
+
+  getPadRow: (page, key, callback) ->
     @db.transaction (tx) ->
       tx.executeSql "SELECT * FROM Pads WHERE page=? AND key=?"
       , [page, key]
@@ -55,31 +75,67 @@ class window.WebSQLStorage
           callback null
         else
           row = results.rows.item(0)
-          callback WebSQLStorage.rowToPad(row)
+          callback row
 
+  #
+  # Create or update a pad
+  # @param page      The current page of the pad to update, or page to create a pad on
+  # @param key       The current key of the pad to update, or key to create a pad on
+  # @param padData   The new data to use. When updating, existing values will be used if
+  #                  they are not specified.
+  # @param callback  A function with no arguments to call when the pad has been set.
+  # @param updatedAt Note that this parameter (which defaults to the current time) will
+  #                  override any updatedAt passed in padData.
+  setPad: (page, key, padData, callback, updatedAt = new Date().getTime()) ->
+    for column, value of padData
+      if not column in WebSQLStorage.padColumns
+        console.warn "#{column} is not supported in WebSQLStorage."
+        delete padData[column]
 
-  setPad: (page, key, name, file, filename, filesize, callback, updatedAt = new Date().getTime()) ->
-    reader = new FileReader();
-    reader.onload = (e) =>
-      @db.transaction (tx) ->
-        tx.executeSql """
-                      INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
-                      """
-        , [page, key, name, e.target.result, filename, filesize, updatedAt],
-          callback?()
-        , (tx, error) ->
-          console.log error
-    reader.readAsDataURL(file);
+    updateDB = =>
+      #
+      # Compares newPadData and oldPadData to get the correct value.
+      # This allows "null" in newPadData to override an existing value
+      # in oldPadData
+      #
+      getValue = (property, newPadData, oldPadData) ->
+        if property of newPadData
+          return newPadData[property]
+        else
+          return (oldPadData || {})[property]
 
-  setPadName: (page, key, name, callback, updatedAt = new Date().getTime()) ->
-    @db.transaction (tx) ->
-      tx.executeSql """
-                    UPDATE Pads SET name = ?, updatedAt = ? WHERE page = ? AND key = ?
-                    """
-      , [name, updatedAt, page, key],
-        callback?()
-      , (tx, error) ->
-        console.log error
+      @getPadRow page, key, (oldPadData) =>
+        for column in WebSQLStorage.padColumns
+          padData[column] = getValue(column, padData, oldPadData)
+
+        padData.page ||= page
+        padData.key  ||= key
+
+        # Mostly for moving. If padData.key != key, then delete the old row
+        # so that it acts like IndexedDB
+        if (padData.page != page) || (padData.key != key)
+          @removePad(page, key)
+
+        @db.transaction (tx) ->
+          tx.executeSql """
+                        INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """
+          , [padData.page, padData.key, padData.name, padData.file, padData.filename, padData.filesize, updatedAt],
+            callback?()
+          , (tx, error) ->
+            throw error
+
+    if padData.file
+      file = padData.file
+
+      reader = new FileReader();
+      reader.onload = (e) =>
+        padData.file = e.target.result
+        updateDB()
+
+      reader.readAsDataURL(file);
+    else
+      updateDB()
 
   removePad: (page, key, callback) ->
     @db.transaction (tx) ->
@@ -88,15 +144,45 @@ class window.WebSQLStorage
         , (tx, results) ->
           callback?()
 
-  setPage: (pageNo, name, callback, updatedAt = new Date().getTime()) ->
-    @db.transaction (tx) ->
-      tx.executeSql """
+  #
+  # Create or update a page in the database.
+  # @param pageNo    The number of the page
+  # @param pageData  The new data to use. When updating, existing values will be used if
+  #                  they are not specified.
+  # @param callback  A function with no arguments to call when the pad has been set.
+  # @param updatedAt Note that this parameter (which defaults to the current time) will
+  #                  override any updatedAt passed in padData.
+  setPage: (pageNo, pageData, callback, updatedAt = new Date().getTime()) ->
+    for column, value of pageData
+      if not column in WebSQLStorage.pageColumns
+        console.warn "#{column} is not supported in WebSQLStorage."
+        delete pageData[column]
+
+    #
+    # Compares newPageData and oldPageData to get the correct value.
+    # This allows "null" in newPageData to override an existing value
+    # in oldPageData
+    #
+    getValue = (property, newPageData, oldPageData) ->
+      if property of newPageData
+        return newPageData[property]
+      else
+        return (oldPageData || {})[property]
+
+    @getPage page, key, (oldPageData) =>
+      for column in WebSQLStorage.pageColumns
+        pageData[column] = getValue(column, pageData, oldPageData)
+
+      pageData.pageNo ||= pageNo
+
+      @db.transaction (tx) ->
+        tx.executeSql """
                     INSERT OR REPLACE INTO Pages VALUES (?, ?, ?)
                     """
-      , [pageNo, name, updatedAt],
-        callback?()
-      , (tx, error) ->
-        console.log error
+        , [pageData.pageNo, pageData.name, updatedAt],
+          callback?()
+        , (tx, error) ->
+            throw error
 
   getPage: (pageNo, callback) ->
     @db.transaction (tx) ->
