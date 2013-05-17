@@ -80,7 +80,7 @@ class window.IndexedDBStorage
   # @param updatedAt Note that this parameter (which defaults to the current time) will
   #                  override any updatedAt passed in padData.
   setPage: (pageNo, pageData, callback, updatedAt = new Date().getTime()) ->
-    getPage pageNo, (oldPageData) =>
+    @getPage pageNo, (oldPageData) =>
       trans = @db.transaction(["page"], "readwrite")
       store = trans.objectStore("page")
 
