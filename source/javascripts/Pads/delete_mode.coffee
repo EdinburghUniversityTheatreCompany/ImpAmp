@@ -20,6 +20,8 @@ enterDeleteMode = ->
   $deleteButton.click (e) ->
     $pad = $(e.currentTarget).closest(".pad")
 
+    $pad.addClass "disabled"
+
     page = impamp.pads.getPage($pad)
     key  = impamp.pads.getKey($pad)
 
