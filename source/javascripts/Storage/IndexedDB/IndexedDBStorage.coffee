@@ -128,8 +128,9 @@ class window.IndexedDBStorage
 
         page = data.pages[dbPage.pageNo] || {}
 
-        page.name      = dbPage.name
-        page.updatedAt = dbPage.updatedAt
+        page.name        = dbPage.name
+        page.emergencies = dbPage.emergencies
+        page.updatedAt   = dbPage.updatedAt
 
         data.pages[dbPage.pageNo] = page
 
@@ -184,7 +185,10 @@ class window.IndexedDBStorage
 
       promises = []
       for num, page of data.pages
-        me.setPage num, page.name, null, row.updatedAt
+        @setPage num,
+          name:        page.name
+          emergencies: page.emergencies
+        , null, page.updatedAt
         for key, row of page
           ((row, me) ->
             deferred = $.Deferred()
@@ -192,7 +196,12 @@ class window.IndexedDBStorage
 
             file = impamp.convertDataURIToBlob row.file
 
-            me.setPad row.page, row.key, row.name, file, row.filename, row.filesize, ->
+            me.setPad row.page, row.key,
+              name: row.name
+              file: file
+              filename: row.filename
+              filesize: row.filesize
+            , ->
               deferred.resolve()
             , row.updatedAt
           )(row, this)

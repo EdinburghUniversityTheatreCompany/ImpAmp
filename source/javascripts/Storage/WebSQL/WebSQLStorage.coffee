@@ -185,7 +185,9 @@ class window.WebSQLStorage
         while i < dbPages.rows.length
           row = dbPages.rows.item(i)
           page = data.pages[row.pageNo] || {}
-          page.name = row.name
+          page.name        = row.name
+          page.emergencies = row.emergencies
+          page.updatedAt   = row.updatedAt
           data.pages[row.pageNo] = page
           i++
 
@@ -211,34 +213,45 @@ class window.WebSQLStorage
     reader.onload = (e) =>
       data = JSON.parse(e.target.result)
 
+      pageTransactions = []
       transactions = []
-      for num, page of data.pages
-        @db.transaction (tx) ->
-          deferred = $.Deferred()
-          transactions.push(deferred.promise())
 
-          tx.executeSql """
-                        INSERT OR REPLACE INTO Pages VALUES (?, ?, ?)
-                        """
-            , [num, page.name, page.updatedAt]
-            , ->
-              for key, row of page
-                tx.executeSql """
-                              INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
-                              """
-                , [row.page, row.key, row.name, row.file, row.filename, row.filesize, row.updatedAt]
-                , ->
-                  deferred.resolve()
-                , (tx, error) ->
-                  throw error
-      waiting  = $.when.apply(null, transactions)
-      complete = 0
-      waiting.then ->
-        complete += 1
-        progress?(complete, transactions.length)
-        return
-      waiting.done ->
-        callback?()
-        return
+      for num, page of data.pages
+        pageDeferred = $.Deferred()
+        pageTransactions.push(pageDeferred.promise())
+
+        ((page, num, pageDeferred) =>
+          @db.transaction (tx) ->
+            tx.executeSql """
+                          INSERT OR REPLACE INTO Pages VALUES (?, ?, ?, ?)
+                          """
+              , [num, page.name, page.updatedAt, page.emergencies]
+              , ->
+                pageDeferred.resolve()
+                for key, row of page
+                  deferred = $.Deferred()
+                  transactions.push(deferred.promise())
+
+                  tx.executeSql """
+                                INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
+                                """
+                  , [row.page, row.key, row.name, row.file, row.filename, row.filesize, row.updatedAt]
+                  , ->
+                    deferred.resolve()
+                  , (tx, error) ->
+                    throw error
+        )(page, num, pageDeferred)
+
+      pageWait = $.when.apply(null, pageTransactions)
+      pageWait.done ->
+        waiting  = $.when.apply(null, transactions)
+        complete = 0
+        waiting.then ->
+          complete += 1
+          progress?(complete, transactions.length)
+          return
+        waiting.done ->
+          callback?()
+          return
 
     reader.readAsText(file);
