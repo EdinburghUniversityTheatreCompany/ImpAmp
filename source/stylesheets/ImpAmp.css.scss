@@ -33,10 +33,6 @@ body {
 }
 
 footer {
-  position: absolute;
-  bottom:   10px;
-  left:     10px;
-
   p {
     color: $gray;
     margin: 0;
@@ -147,6 +143,20 @@ footer {
     line-height: 5em;
 
     text-decoration: none;
+  }
+}
+
+#now-playing h2 {
+  height: 1.6em;
+}
+
+.now-playing-item {
+  @extend .padish;
+
+  margin-bottom: 0;
+
+  .btn {
+    height: 5em;
   }
 }
 

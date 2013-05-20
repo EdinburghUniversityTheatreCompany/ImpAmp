@@ -50,10 +50,31 @@
           <% end %>
         </div>
       </div>
+
+      <hr />
+
+      <div id="now-playing" class="row">
+        <div class="span2">
+          <h2>Playing:</h2>
+        </div>
+        <div class="now-playing-item span2" style="display: none">
+          <a class="btn">
+            <span class="name">
+            </span>
+
+            <div class="progress">
+              <div class="bar"></div>
+              <span></span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <hr />
+
+      <%= partial 'footer' %>
     </div>
 
     <%= partial 'help_modal' %>
-
-    <%= partial 'footer' %>
   </body>
 </html>

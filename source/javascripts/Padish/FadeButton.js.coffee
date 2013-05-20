@@ -31,8 +31,6 @@ $ ->
           elem.pause()
           elem.currentTime = 0
           elem.volume = 1;
-          $pad = $(elem).closest(".pad")
-          $pad.find(".progress").hide()
 
           $progress.hide()
 

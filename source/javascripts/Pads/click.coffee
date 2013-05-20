@@ -17,15 +17,11 @@ playPausePad = ($pad) ->
   $progress = $pad.find(".progress")
 
   if audio.paused
-    $progress.show()
-
     audio.play()
   else
     # Playing. Stop and reset
     audio.pause()
     audio.currentTime = 0
-
-    $progress.hide()
 
 renamePad = ($pad) ->
   $modal = nameChangeModal()

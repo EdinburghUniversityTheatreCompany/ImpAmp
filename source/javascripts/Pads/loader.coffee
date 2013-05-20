@@ -55,9 +55,18 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
 
       $progress_text.text(Math.round(audioElement.duration - audioElement.currentTime))
 
-    $audioElement.on 'ended', (e) ->
-      $progress = $pad.find(".progress")
+    $progress = $pad.find(".progress")
+
+    $audioElement.on 'play', (e) ->
+      $progress.show()
+      impamp.addNowPlaying($pad)
+
+    pauseEndHandler = (e) ->
       $progress.hide()
+      impamp.removeNowPlaying($pad)
+
+    $audioElement.on 'pause', pauseEndHandler
+    $audioElement.on 'ended', pauseEndHandler
 
     $audioElement.on 'error', (element) ->
       $pad.addClass("error")
