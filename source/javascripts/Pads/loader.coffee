@@ -1,16 +1,39 @@
 $.when(impamp.storage, impamp.docReady).done (storage) ->
+  $('#loading-modal').modal('show')
   impamp.loadPads(storage)
 
+$.when(impamp.padsLoaded).done ->
+  $('#loading-modal').modal('hide')
+
 impamp.loadPads = loadPads = (storage) ->
+  padPromises = []
+  count = 0
+
   $('.pad').each (i, pad) ->
+    deferred = $.Deferred()
+    padPromises.push(deferred)
+
     $pad = $(pad)
+    loadPad $pad, storage, ->
+      deferred.resolve()
+      count += 1
+      $padsLoaded.text(count)
 
-    loadPad($pad, storage)
+      return
 
-impamp.loadPad =  loadPad  = ($pad, storage) ->
+  $padsTotal = $('#loading-modal').find('#pads-total')
+  $padsTotal.text(padPromises.length)
+
+  $padsLoaded = $('#loading-modal').find('#pads-loaded')
+
+  waiting = $.when.apply($, padPromises)
+  waiting.done ->
+    impamp.padsLoaded.resolve()
+
+impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
   if not storage?
     impamp.storage.done (storage) ->
-      impamp.loadPad($pad, storage)
+      impamp.loadPad($pad, storage, callback)
     return
 
   page = impamp.pads.getPage $pad
@@ -30,6 +53,7 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
       $pad.removeData('filesize', null)
       $pad.removeAttr('data-downloadurl')
 
+      callback?(false)
       return
 
     $pad.data('name', padData.name)
@@ -79,3 +103,5 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
     $audioElement.on 'error', (element) ->
       $pad.addClass("error")
       return true
+
+    callback?(true)

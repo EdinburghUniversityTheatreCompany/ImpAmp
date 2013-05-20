@@ -7,8 +7,9 @@ impamp.storageTypes =
   WEB_SQL:    2
 
 # jQuery deferred objects:
-impamp.docReady = $.Deferred();
-impamp.storage = $.Deferred();
+impamp.docReady   = $.Deferred();
+impamp.storage    = $.Deferred();
+impamp.padsLoaded = $.Deferred();
 
 
 $ ->
