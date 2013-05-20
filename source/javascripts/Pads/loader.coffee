@@ -21,18 +21,18 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
     $pad.removeClass "disabled"
     $pad.removeClass "error"
 
-    if not padData?
+    $pad.data('updatedAt', padData.updatedAt) if (padData? && padData.updatedAt?)
+
+    if (not padData?) || (not padData.file?)
       $pad.addClass "disabled"
       $pad.removeData('name', null)
       $pad.removeData('filename', null)
-      $pad.removeData('updatedAt', null)
       $pad.removeData('filesize', null)
 
       return
 
     $pad.data('name', padData.name)
     $pad.data('filename', padData.filename)
-    $pad.data('updatedAt', padData.updatedAt)
     $pad.data('filesize', padData.filesize)
 
     url = window.URL.createObjectURL(padData.file);

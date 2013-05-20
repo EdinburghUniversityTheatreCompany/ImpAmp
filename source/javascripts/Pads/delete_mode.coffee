@@ -23,10 +23,8 @@ enterDeleteMode = ->
     page = impamp.pads.getPage($pad)
     key  = impamp.pads.getKey($pad)
 
-    impamp.sync.deletePad page, key
-
     impamp.storage.done (storage) ->
-      storage.removePad page, key, ->
+      storage.clearPad page, key, ->
         impamp.loadPad($pad)
 
         $(e.currentTarget).remove()

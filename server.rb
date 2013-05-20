@@ -23,38 +23,8 @@ class ImpAmpServer < Sinatra::Base
 
     pages = data["pages"]
     page = pages[page_no] || {}
-    pad  = page[key] || {}
 
-    pad[:name]      = params[:name]
-    pad[:filename]  = params[:filename]
-    pad[:filesize]  = params[:filesize]
-    pad[:updatedAt] = params[:updatedAt]
-
-    page[key]     = pad
-    data["pages"][page_no] = page
-
-    File.open('impamp_server.json','wb+') do |f|
-      f.write data.to_json
-    end
-
-    return :success
-  end
-
-  delete '/pad/:page_no/:key' do |page_no, key|
-    key = "." if key == "period"
-    key = "/" if key == "slash"
-
-    data = JSON.parse( IO.read('impamp_server.json') )
-
-    pages = data["pages"]
-    page = pages[page_no]
-
-    pad  = page[key] || {}
-
-    pad[:name]      = nil
-    pad[:filename]  = nil
-    pad[:filesize]  = nil
-    pad[:updatedAt] = Time.now.to_i * 1000
+    pad = JSON.parse(request.body.read)
 
     page[key]     = pad
     data["pages"][page_no] = page
@@ -72,8 +42,7 @@ class ImpAmpServer < Sinatra::Base
     pages = data["pages"]
     page = pages[page_no] || {}
 
-    page[:name]      = params[:name]
-    page[:updatedAt] = params[:updatedAt]
+    page.merge! JSON.parse(request.body.read)
 
     data["pages"][page_no] = page
 

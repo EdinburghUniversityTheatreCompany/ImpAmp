@@ -72,15 +72,6 @@ updatePad = ($pad, serverPad) ->
 
   if (not serverPad.updatedAt?) || (updatedAt > serverPad.updatedAt)
     return sendToServer($pad)
-  else if serverPad.filename == null
-    deferred = $.Deferred()
-
-    impamp.storage.done (storage) ->
-      storage.removePad impamp.pads.getPage($pad), impamp.pads.getKey($pad), ->
-        impamp.loadPad($pad)
-        deferred.resolve()
-
-    return deferred.promise()
   else
     return getFromServer($pad, serverPad)
 
@@ -95,7 +86,26 @@ sendToServer = ($pad) ->
   impamp.storage.done (storage) ->
     storage.getPad page, key, (padData) ->
 
-      # First, upload the file
+      sendServerPad = ->
+        # Remove the blob
+        delete padData.file
+
+        # Then send the padData
+        $.ajax
+          url:  config.url + "pad/#{padData.page}/#{keyURI(padData.key)}"
+          type: "POST"
+          data: JSON.stringify(padData)
+          error: ->
+            deferred.reject()
+
+        deferred.resolve()
+        return
+
+      # Fetch the file first, unless the file is null
+      if padData.filename == null
+        sendServerPad()
+        return
+
       oReq = new XMLHttpRequest();
       oReq.open("POST", config.url + "audio/" + padData.filename, true);
       oReq.setRequestHeader("Content-Type", "application/octet-stream")
@@ -109,19 +119,7 @@ sendToServer = ($pad) ->
           deferred.reject()
           return
 
-        # Remove the blob
-        delete padData.file
-
-        # Then send the padData
-        $.ajax
-          url:  config.url + "pad/#{padData.page}/#{keyURI(padData.key)}"
-          type: "POST"
-          data: padData
-          error: ->
-            deferred.reject()
-
-        deferred.resolve()
-        return
+        sendServerPad()
 
       oReq.upload.addEventListener 'progress'
       , (e) ->
@@ -141,6 +139,7 @@ sendToServer = ($pad) ->
       , false
 
       oReq.send(padData.file);
+      return
 
   return deferred.promise()
 
@@ -151,6 +150,20 @@ getFromServer = ($pad, serverPad) ->
 
   page = impamp.pads.getPage $pad
   key  = impamp.pads.getKey  $pad
+
+  loadServerPad = ->
+    impamp.storage.done (storage) ->
+      storage.setPad page, key, serverPad, ->
+        impamp.loadPad($pad, storage)
+        deferred.resolve()
+        return
+      , serverPad.updatedAt
+
+  # Fetch the file first, unless the file is null
+  if serverPad.filename == null
+    serverPad.file = null
+    loadServerPad()
+    return deferred.promise()
 
   oReq = new XMLHttpRequest();
   oReq.open("GET", config.url + "audio/#{serverPad.filename}", true);
@@ -166,12 +179,7 @@ getFromServer = ($pad, serverPad) ->
 
     serverPad.file = oReq.response
 
-    impamp.storage.done (storage) ->
-      storage.setPad page, key, serverPad, ->
-        impamp.loadPad($pad, storage)
-        deferred.resolve()
-        return
-      , serverPad.updatedAt
+    loadServerPad()
 
   oReq.addEventListener 'progress'
     , (e) ->
@@ -189,11 +197,6 @@ getFromServer = ($pad, serverPad) ->
   oReq.send();
 
   return deferred.promise()
-
-impamp.sync.deletePad = deletePad = (page, key) ->
-  $.ajax
-    type: "DELETE",
-    url:  config.url + "pad/#{page}/#{keyURI(key)}"
 
 # Should return a jQuery promise.
 updatePage = ($pageNav, serverPage) ->
@@ -225,7 +228,7 @@ sendPageToServer = ($pageNav) ->
       $.ajax
         url:  config.url + "page/#{pageNo}"
         type: "POST"
-        data: pageData
+        data: JSON.stringify(pageData)
         error: ->
           deferred.reject()
 

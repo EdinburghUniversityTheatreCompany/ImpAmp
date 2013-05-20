@@ -2,11 +2,14 @@ class window.WebSQLStorage
   @db: null
 
   @rowToPad: (row) ->
+    if row.file?
+      file = impamp.convertDataURIToBlob row.file
+
     data =
       page: row.page
       key:  row.key
       name: row.name
-      file: impamp.convertDataURIToBlob row.file
+      file: file
       filename: row.filename
       filesize: row.filesize
       updatedAt: row.updatedAt
@@ -88,7 +91,7 @@ class window.WebSQLStorage
         # Mostly for moving. If padData.key != key, then delete the old row
         # so that it acts like IndexedDB
         if (padData.page != page) || (padData.key != key)
-          @removePad(page, key)
+          @clearPad(page, key)
 
         @db.transaction (tx) ->
           tx.executeSql """
@@ -111,12 +114,14 @@ class window.WebSQLStorage
     else
       updateDB()
 
-  removePad: (page, key, callback) ->
-    @db.transaction (tx) ->
-      tx.executeSql "DELETE FROM Pads WHERE page=? AND key=?"
-        , [page, key]
-        , (tx, results) ->
-          callback?()
+  clearPad: (page, key, callback) ->
+    @setPad page, key
+    ,
+      name: null
+      file: null
+      filename: null
+      filesize: null
+    , callback
 
   #
   # Create or update a page in the database.

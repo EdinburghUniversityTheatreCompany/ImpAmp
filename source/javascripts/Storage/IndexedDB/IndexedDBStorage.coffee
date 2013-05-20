@@ -52,7 +52,7 @@ class window.IndexedDBStorage
       padData.key  ||= key
 
       if (padData.page != page) || (padData.key != key)
-        @removePad(page, key)
+        @clearPad(page, key)
 
       trans = @db.transaction(["pad"], "readwrite")
       store = trans.objectStore("pad")
@@ -64,12 +64,14 @@ class window.IndexedDBStorage
       request.onerror = (e) ->
         throw e
 
-  removePad: (page, key, callback) ->
-    trans = @db.transaction(["pad"], "readwrite")
-    store = trans.objectStore("pad")
-    request = store.delete([page, key])
-    request.onsuccess = ->
-      callback?()
+  clearPad: (page, key, callback) ->
+    @setPad page, key
+    ,
+      name: null
+      file: null
+      filename: null
+      filesize: null
+    , callback
 
   #
   # Create or update a page in the database.

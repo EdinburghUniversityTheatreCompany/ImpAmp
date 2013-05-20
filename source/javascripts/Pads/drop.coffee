@@ -74,13 +74,12 @@ movePad = ($new_pad, ia_move_data) ->
 
   impamp.storage.done (storage) ->
     # First, get rid if there is a pad there already.
-    storage.removePad new_page, new_key, ->
+    storage.clearPad new_page, new_key, ->
       # Then update the pad.
       storage.setPad old_page, old_key,
         page: new_page
         key:  new_key
       , ->
-        impamp.sync.deletePad old_page, old_key
         impamp.loadPad($old_pad)
         impamp.loadPad($new_pad)
 
