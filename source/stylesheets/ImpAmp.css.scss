@@ -151,8 +151,12 @@ hr {
   }
 }
 
-#now-playing h2 {
-  height: 1.6em;
+#now-playing {
+  overflow: hidden;
+
+  h2 {
+    height: 1.6em;
+  }
 }
 
 .now-playing-item {

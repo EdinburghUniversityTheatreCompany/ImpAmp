@@ -1,6 +1,5 @@
 impamp.addNowPlaying = ($pad) ->
   $item = $('.now-playing-item').first().clone()
-  $item.show()
 
   $item.attr("data-pad-page", impamp.pads.getPage $pad)
   $item.attr("data-pad-key",  impamp.pads.getKey  $pad)
@@ -9,6 +8,7 @@ impamp.addNowPlaying = ($pad) ->
 
   $item.find(".name").text($pad.find(".name").text())
 
+  # Pass on clicks.
   $item.find("a").click ->
     $pad.find("a").click()
 
@@ -25,6 +25,7 @@ impamp.addNowPlaying = ($pad) ->
     $progress_text.text(Math.round(audioElement.duration - audioElement.currentTime))
 
   $nowPlaying.append $item
+  $item.fadeIn(1000)
 
 impamp.removeNowPlaying = ($pad) ->
   page = impamp.pads.getPage $pad
@@ -36,5 +37,16 @@ impamp.removeNowPlaying = ($pad) ->
   key = "\\\\" if key == "\\"
 
   $item = $(".now-playing-item[data-pad-page='#{page}'][data-pad-key='#{key}']")
-  $item.remove()
+
+  $item.find(".progress").hide()
+
+  # fadeOut, then slide off so that if there are multiple playing items,
+  # they will slide up nicely.
+  $item.animate
+    opacity: 0
+  , 1000
+  $item.animate
+    "margin-left": -1000
+  , 1000, ->
+    $item.remove()
 
