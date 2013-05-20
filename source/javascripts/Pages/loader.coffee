@@ -25,4 +25,5 @@ impamp.loadPage  = loadPage  = ($pageNav, storage) ->
       #{pageData.name}
                   """
     $pageNav.data("name", pageData.name)
+    $pageNav.attr("data-emergencies", parseInt(pageData.emergencies))
     $pageNav.data("updatedAt", pageData.updatedAt)

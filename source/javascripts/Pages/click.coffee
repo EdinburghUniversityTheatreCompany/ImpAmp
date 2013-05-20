@@ -8,12 +8,21 @@ $ ->
     $modal = nameChangeModal()
 
     $('#renameInput').val($pageNav.data("name"))
+
+    if $pageNav.data("emergencies") == 1
+      $('#emergenciesInput').attr "checked", "checked"
+
     $modal.find('.modal-confirm').click (e) ->
       e.preventDefault()
       newName = $('#renameInput').val()
 
+      emergencies = if $('#emergenciesInput').is(":checked") is true then 1 else 0
+
       impamp.storage.done (storage) ->
-        storage.setPage impamp.pages.getPageNo($pageNav), { name: newName }, ->
+        storage.setPage impamp.pages.getPageNo($pageNav),
+          name: newName
+          emergencies: emergencies
+        , ->
           impamp.loadPage($pageNav)
           $modal.modal('hide')
 
@@ -24,7 +33,11 @@ $ ->
 nameChangeModal = ->
   title = "Rename Page"
   body  = """
-          <input id="renameInput">
+          <label>Page Name:</label>
+          <input id="renameInput" type="text">
+          <label class="checkbox">
+            <input id="emergenciesInput" type="checkbox"> Contains Emergencies?
+          </label>
           """
 
   return impamp.showModal(title, body, "Rename")

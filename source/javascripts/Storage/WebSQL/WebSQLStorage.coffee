@@ -45,6 +45,11 @@ class window.WebSQLStorage
                     )
                     """
 
+    migrator.migration "1.1", "1.2", (tx) ->
+      tx.executeSql """
+                    ALTER TABLE Pages ADD emergencies
+                    """
+
     migrator.migrate ->
       impamp.storage.resolve me
 
@@ -149,9 +154,9 @@ class window.WebSQLStorage
 
       @db.transaction (tx) ->
         tx.executeSql """
-                    INSERT OR REPLACE INTO Pages VALUES (?, ?, ?)
+                    INSERT OR REPLACE INTO Pages VALUES (?, ?, ?, ?)
                     """
-        , [pageData.pageNo, pageData.name, updatedAt],
+        , [pageData.pageNo, pageData.name, updatedAt, pageData.emergencies],
           callback?()
         , (tx, error) ->
             throw error

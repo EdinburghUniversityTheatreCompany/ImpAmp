@@ -46,6 +46,14 @@ impamp.addPageHandlers = addPageHandlers = ($page) ->
     $body.on 'keydown', handler
     activePadishKeyHandlers.push handler
 
+  enterHandler = (e) ->
+    return unless e.keyCode == 13
+
+    # First stop any existing tracks:
+    $page.find('.padish a[data-shortcut="esc"]').click()
+
+    playEmergency();
+
   escapeHandler = (e) ->
     return unless e.keyCode == 27
     $page.find('.padish a[data-shortcut="esc"]').click()
@@ -54,9 +62,11 @@ impamp.addPageHandlers = addPageHandlers = ($page) ->
     return unless getCharCode(e.keyCode) == 32
     $page.find('.padish a[data-shortcut="space"]').click()
 
+  $body.on 'keydown', enterHandler
   $body.on 'keydown', escapeHandler
   $body.on 'keydown', spaceHandler
 
+  activePadishKeyHandlers.push enterHandler
   activePadishKeyHandlers.push escapeHandler
   activePadishKeyHandlers.push spaceHandler
 
@@ -67,6 +77,17 @@ impamp.removePadishKeyHandlers = removePadishKeyHandlers = ->
     $('body').off('keydown', handler)
 
   activePadishKeyHandlers = []
+
+playEmergency = ->
+  $pages =  $()
+
+  $('.page-nav a[data-emergencies="1"]').each((i, pageNav) -> $pages = $pages.add($(pageNav).attr("href")))
+  $possiblePads = $pages.find(".pad").not(".error, .disabled")
+
+  index = Math.floor(Math.random() * $possiblePads.length)
+  $pad = $possiblePads.eq(index)
+
+  $pad.find("a").click()
 
 getCharCode = (keycode) ->
   # See http://unixpapa.com/js/key.html

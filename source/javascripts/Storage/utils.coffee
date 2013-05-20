@@ -47,5 +47,6 @@ impamp.pageColumns =
   [
     "pageNo"
     "name"
+    "emergencies"
     "updatedAt"
   ]
