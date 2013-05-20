@@ -81,6 +81,11 @@ footer {
     -moz-box-sizing: border-box;
   }
 
+  .name {
+    word-break: break-word;
+    hyphens: auto;
+  }
+
   .progress {
     position: absolute;
 
