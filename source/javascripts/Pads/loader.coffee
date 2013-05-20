@@ -28,12 +28,14 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
       $pad.removeData('name', null)
       $pad.removeData('filename', null)
       $pad.removeData('filesize', null)
+      $pad.removeAttr('data-downloadurl')
 
       return
 
     $pad.data('name', padData.name)
     $pad.data('filename', padData.filename)
     $pad.data('filesize', padData.filesize)
+    $pad.attr('data-downloadurl', "application/octet-stream:#{padData.filename}:#{window.URL.createObjectURL(padData.file)}")
 
     url = window.URL.createObjectURL(padData.file);
     $pad.find("audio").attr("src", url)

@@ -13,7 +13,14 @@ $ ->
     $pad = $(pad)
 
     $pad.on "dragstart", (e) ->
-      e.originalEvent.dataTransfer.setData "application/x-impamp-move", "#{impamp.pads.getPage $pad} #{impamp.pads.getKey $pad}"
+      page = impamp.pads.getPage $pad
+      key  = impamp.pads.getKey  $pad
+
+      evt = e.originalEvent
+      evt.dataTransfer.setData "application/x-impamp-move", "#{page} #{key}"
+
+      # For file download:
+      evt.dataTransfer.setData("DownloadURL", $pad.data("downloadurl"));
 
     $pad.on "dragover", ->
       #add hover class when drag over
