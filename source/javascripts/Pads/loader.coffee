@@ -43,6 +43,14 @@ impamp.loadPad =  loadPad  = ($pad, storage) ->
 
     $audioElement = $pad.find("audio")
     audioElement = $audioElement[0]
+
+    # Clear existing handlers:
+    $audioElement.off 'timeupdate'
+    $audioElement.off 'play'
+    $audioElement.off 'pause'
+    $audioElement.off 'ended'
+    $audioElement.off 'error'
+
     $audioElement.on 'timeupdate', (e) ->
       $progress_bar = $pad.find(".progress .bar")
       $progress_bar.removeClass "bar-warning"
