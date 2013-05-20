@@ -60,7 +60,11 @@ impamp.addPageHandlers = addPageHandlers = ($page) ->
 
   spaceHandler  = (e) ->
     return unless getCharCode(e.keyCode) == 32
+
+    e.preventDefault() # prevent scroll down
     $page.find('.padish a[data-shortcut="space"]').click()
+
+    return true
 
   $body.on 'keydown', enterHandler
   $body.on 'keydown', escapeHandler
