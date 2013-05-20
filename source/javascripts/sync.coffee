@@ -121,6 +121,9 @@ sendToServer = ($pad) ->
 
         sendServerPad()
 
+      oReq.onerror = (e) ->
+        deferred.reject()
+
       oReq.upload.addEventListener 'progress'
       , (e) ->
         $audioElement = $pad.find("audio")
@@ -180,6 +183,9 @@ getFromServer = ($pad, serverPad) ->
     serverPad.file = oReq.response
 
     loadServerPad()
+
+  oReq.onerror = (e) ->
+    deferred.reject()
 
   oReq.addEventListener 'progress'
     , (e) ->
