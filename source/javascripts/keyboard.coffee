@@ -10,7 +10,9 @@ impamp.addNavHandlers = addNavHandlers = ->
     shortcut = $item.data('shortcut')
     charcode = shortcut.toString().charCodeAt(0)
 
-    $item.click ->
+    $item.click (e) ->
+      return if e.ctrlKey
+
       $page = $($item.attr('href'))
       addPageHandlers($page)
 
@@ -26,6 +28,8 @@ impamp.addNavHandlers = addNavHandlers = ->
 impamp.removeNavHandlers = removeNavHandlers = ->
   $.each activeNavHandlers, (i, handler) ->
     $('body').off('keydown', handler)
+
+  activeNavHandlers = []
 
 impamp.addPageHandlers = addPageHandlers = ($page) ->
   removePadishKeyHandlers()
