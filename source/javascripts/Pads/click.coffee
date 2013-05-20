@@ -44,7 +44,7 @@ renamePad = ($pad) ->
 nameChangeModal = ->
   title = "Rename Pad"
   body  = """
-          <input id="renameInput">
+          <input id="renameInput" type="text">
           """
 
   return impamp.showModal(title, body, "Rename")
