@@ -214,6 +214,7 @@ hr {
     color: #fff;
   }
 }
+
 // Active state, and it's :hover/:focus to override normal :hover/:focus
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover,
@@ -221,6 +222,10 @@ hr {
   color: rgba(226, 107, 24, 1);
   border: 1px solid rgba(226, 107, 24, 1);
   border-bottom-color: transparent;
+}
+
+#loading-modal.fade.in {
+  top: 40%;
 }
 
 .fade-out .progress .bar {

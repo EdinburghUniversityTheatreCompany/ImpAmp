@@ -270,5 +270,5 @@ impamp.setSyncButton = setSyncButton = (icon, text) ->
   <i class="icon-#{icon}"></i> #{text}
                      """
 
-$.when(impamp.storage, impamp.docReady).done ->
+$.when(impamp.padsLoaded).done ->
   setInterval sync, 10 * 1000
