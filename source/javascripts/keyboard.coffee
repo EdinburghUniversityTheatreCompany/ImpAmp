@@ -23,7 +23,7 @@ impamp.addKeyHandler = addKeyHandler = ->
       return
 
     character = String.fromCharCode(charcode).toLowerCase()
-    character = "\\\\" if character == "\\" # Escaping woes
+    character = impamp.pads.escapeKey(character)
 
     if charcode == 27
       character = "esc"

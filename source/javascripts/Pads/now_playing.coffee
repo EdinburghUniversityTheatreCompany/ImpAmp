@@ -31,10 +31,7 @@ impamp.removeNowPlaying = ($pad) ->
   page = impamp.pads.getPage $pad
   key  = impamp.pads.getKey  $pad
 
-  # Escaping woes...
-  # Basically, checks if key is '\' and then escapes it for jQuery.
-  # Except that '\' needs escaping... so two backslashes, both escaped.
-  key = "\\\\" if key == "\\"
+  key = impamp.pads.escapeKey(key)
 
   $item = $(".now-playing-item[data-pad-page='#{page}'][data-pad-key='#{key}']")
 

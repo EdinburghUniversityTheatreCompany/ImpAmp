@@ -70,7 +70,7 @@ movePad = ($new_pad, ia_move_data) ->
   old_page = ia_move_data.split(" ")[0]
   old_key  = ia_move_data.split(" ")[1]
 
-  $old_pad = $(".pad-page.active a[data-shortcut='#{old_key}']").closest(".pad")
+  $old_pad = $(".pad-page.active a[data-shortcut='#{impamp.pads.escapeKey(old_key)}']").closest(".pad")
   $old_pad.addClass "disabled"
 
   $old_pad.find(".name").text "Please Wait..."
