@@ -29,7 +29,9 @@ es.onmessage = (e) ->
   $progress_bar = $pad.find(".progress .bar")
 
   switch data.type
-    when "play", "timeupdate"
+    when "play"
+      impamp.addNowCollaborating($pad, data.playId)
+    when "timeupdate"
       $progress_bar.addClass "bar-grey"
       $progress.show()
 
@@ -40,17 +42,21 @@ es.onmessage = (e) ->
       $progress_text = $pad.find(".progress > span")
       $progress_text.text(Math.round(audioElement.duration - data.time))
 
+      impamp.updateNowCollaborating($pad, data.playId, data.time)
+
     when "pause"
       $progress.hide()
+      impamp.removeNowCollaborating(data.playId)
 
-impamp.collaboration.play = (page, key, time) ->
+impamp.collaboration.play = (page, key, playId, time) ->
   $.post "/c/play",
     page: page
     key:  key
+    playId: playId
     time: time
 
 lastUpdate = null
-impamp.collaboration.timeupdate = (page, key, time) ->
+impamp.collaboration.timeupdate = (page, key, playId, time) ->
   now = new Date()
 
   # Update max once a second
@@ -60,10 +66,12 @@ impamp.collaboration.timeupdate = (page, key, time) ->
   $.post "/c/timeupdate",
     page: page
     key:  key
+    playId: playId
     time: time
 
-impamp.collaboration.pause = (page, key, time) ->
+impamp.collaboration.pause = (page, key, playId, time) ->
   $.post "/c/pause",
     page: page
     key:  key
+    playId: playId
     time: time

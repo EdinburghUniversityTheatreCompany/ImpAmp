@@ -14,33 +14,38 @@ class ImpAmpCollaboration < Sinatra::Base
       out << "retry: 30000\n\n"
 
       @@connections << out
+
+      # Send something every 20 seconds to keep the connection open.
+      EventMachine::PeriodicTimer.new(20) { out << "\0" }
+
       out.callback { @@connections.delete(out) }
     end
   end
 
   post '/c/play' do
-    send_message("play", params[:page], params[:key], params[:time])
+    send_message("play", params[:page], params[:key], params[:playId], params[:time])
 
     return 204
   end
 
   post '/c/timeupdate' do
-    send_message("timeupdate", params[:page], params[:key], params[:time])
+    send_message("timeupdate", params[:page], params[:key], params[:playId], params[:time])
 
     return 204
   end
 
   post '/c/pause' do
-    send_message("pause", params[:page], params[:key], params[:time])
+    send_message("pause", params[:page], params[:key], params[:playId], params[:time])
 
     return 204
   end
 
-  def send_message(type, page, key, time)
+  def send_message(type, page, key, playId, time)
     message = {
       type: type,
       page: page,
       key:  key,
+      playId: playId,
       time: time
     }
 

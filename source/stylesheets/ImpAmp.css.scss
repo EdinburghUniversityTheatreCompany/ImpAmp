@@ -104,6 +104,12 @@ hr {
       bottom: 0;
     }
   }
+
+  &.disabled {
+    .btn {
+      @extend .disabled;
+    }
+  }
 }
 
 .pad {
@@ -112,12 +118,6 @@ hr {
   /* Hide these error messages - we'll deal with it ourselves thanks. */
   .me-cannotplay {
     display: none;
-  }
-
-  &.disabled {
-    .btn {
-      @extend .disabled;
-    }
   }
 
   &.error {
