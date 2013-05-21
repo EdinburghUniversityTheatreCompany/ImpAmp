@@ -1,7 +1,9 @@
 require 'rack'
 require './server'
+require './collaboration'
 
 use ImpAmpServer
+use ImpAmpCollaboration
 
 use Rack::Static, root: "build", urls: %w[/], index: "index.html"
 

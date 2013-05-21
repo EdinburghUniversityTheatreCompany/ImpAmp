@@ -235,3 +235,7 @@ hr {
        -o-transition: none;
           transition: none;
 }
+
+.progress .bar-grey {
+  @include gradient-vertical(#c0c0c0, #808080);
+}

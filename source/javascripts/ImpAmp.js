@@ -17,3 +17,4 @@
 //= require keyboard
 //= require sync
 //= require version
+//= require collaboration

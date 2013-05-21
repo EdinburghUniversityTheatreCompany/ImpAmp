@@ -76,8 +76,11 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
     $audioElement.off 'error'
 
     $audioElement.on 'timeupdate', (e) ->
+      return if audioElement.paused
+
       $progress_bar = $pad.find(".progress .bar")
       $progress_bar.removeClass "bar-warning"
+      $progress_bar.removeClass "bar-grey"
 
       $progress_text = $pad.find(".progress > span")
 
@@ -87,15 +90,19 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
 
       $progress_text.text(Math.round(audioElement.duration - audioElement.currentTime))
 
+      impamp.collaboration.timeupdate page, key, audioElement.currentTime
+
     $progress = $pad.find(".progress")
 
     $audioElement.on 'play', (e) ->
       $progress.show()
       impamp.addNowPlaying($pad)
+      impamp.collaboration.play page, key, audioElement.currentTime
 
     pauseEndHandler = (e) ->
       $progress.hide()
       impamp.removeNowPlaying($pad)
+      impamp.collaboration.pause page, key, audioElement.currentTime
 
     $audioElement.on 'pause', pauseEndHandler
     $audioElement.on 'ended', pauseEndHandler
