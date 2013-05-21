@@ -125,6 +125,10 @@ getCharCode = (keycode) ->
     when 222
       # '
       return 39
+    when 91
+      # Super key - but it has the same keycode as the charcode for [.
+      # (cause that makes sense...)
+      return 0
     else
       return keycode
 
