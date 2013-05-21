@@ -9,7 +9,7 @@ $ ->
 
     $('#renameInput').val($pageNav.data("name"))
 
-    if $pageNav.data("emergencies") == 1
+    if $pageNav.attr("data-emergencies") == "1"
       $('#emergenciesInput').attr "checked", "checked"
 
     $modal.find('.modal-confirm').click (e) ->
