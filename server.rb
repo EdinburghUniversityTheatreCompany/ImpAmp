@@ -29,9 +29,13 @@ class ImpAmpServer < Sinatra::Base
     page[key]     = pad
     data["pages"][page_no] = page
 
-    File.open('impamp_server.json','wb+') do |f|
+    lock = File.open('impamp_server.json')
+    lock.flock(File::LOCK_EX)
+    File.open('impamp_server.json','w+') do |f|
       f.write data.to_json
     end
+    lock.flock(File::LOCK_UN)
+    lock.close
 
     return :success
   end
@@ -46,9 +50,13 @@ class ImpAmpServer < Sinatra::Base
 
     data["pages"][page_no] = page
 
-    File.open('impamp_server.json','wb+') do |f|
+    lock = File.open('impamp_server.json')
+    lock.flock(File::LOCK_EX)
+    File.open('impamp_server.json','w+') do |f|
       f.write data.to_json
     end
+    lock.flock(File::LOCK_UN)
+    lock.close
 
     return :success
   end
