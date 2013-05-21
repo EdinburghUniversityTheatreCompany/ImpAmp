@@ -14,8 +14,7 @@ es.onerror = ->
 es.onmessage = (e) ->
   data = JSON.parse(e.data)
 
-  # Escaping woes
-  data.key = "\\\\" if data.key == "\\"
+  data.key = impamp.pads.escapeKey(data.key)
 
   # Find the pad
   $page = $("#page_#{data.page}")
@@ -29,9 +28,10 @@ es.onmessage = (e) ->
   $progress_bar = $pad.find(".progress .bar")
 
   switch data.type
-    when "play"
-      impamp.addNowCollaborating($pad, data.playId)
-    when "timeupdate"
+    when "play", "timeupdate"
+      if $(".now-playing-item[data-playId='#{data.playId.replace("\\", "\\\\")}']").length == 0
+        impamp.addNowCollaborating($pad, data.playId)
+
       $progress_bar.addClass "bar-grey"
       $progress.show()
 

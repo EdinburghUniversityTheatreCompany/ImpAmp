@@ -45,12 +45,12 @@ impamp.addNowCollaborating = ($pad, playId) ->
 
 impamp.updateNowCollaborating = ($pad, playId, time) ->
   audioElement = $pad.find("audio")[0]
-  $item = $(".now-playing-item[data-playId='#{playId}']")
+  $item = $(".now-playing-item[data-playId='#{playId.replace("\\", "\\\\")}']")
 
   updateProgressBar($item, time, audioElement.duration)
 
 impamp.removeNowCollaborating = (playId) ->
-  $item = $(".now-playing-item[data-playId='#{playId}']")
+  $item = $(".now-playing-item[data-playId='#{playId.replace("\\", "\\\\")}']")
   removeItem($item)
 
 updateProgressBar = ($item, time, duration) ->
