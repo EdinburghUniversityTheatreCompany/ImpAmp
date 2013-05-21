@@ -1,90 +1,48 @@
 
-activePadishKeyHandlers    = []
-activeNavHandlers = []
+keyHandler = null
 
-impamp.addNavHandlers = addNavHandlers = ->
-  $body = $('body')
+impamp.addKeyHandler = addKeyHandler = ->
+  keyHandler = (e) ->
+    # See http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+    # Listen for:
+    #  * 13, 27, 32 (enter, escape and space)
+    #  * 48  to 90  (number and letter keys)
+    #  * 186 to 222 (punctuation keys etc)
+    return unless e.keyCode in [13, 27, 32] || 48 <= e.keyCode <= 90 || 186 <= e.keyCode <= 222
 
-  $('.page-nav a[data-shortcut]').each (i, item) ->
-    $item = $(item)
-    shortcut = $item.data('shortcut')
-    charcode = shortcut.toString().charCodeAt(0)
+    e.preventDefault()
 
-    $item.click (e) ->
-      return if e.ctrlKey
+    charcode = getCharCode(e.keyCode)
 
-      $page = $($item.attr('href'))
-      addPageHandlers($page)
+    # Enter handler (no button)
+    if e.keyCode == 13
+      # First stop any existing tracks:
+      $('.pad-page.active a[data-shortcut="esc"]').click()
 
-    navHandler = (e) ->
-      return unless getCharCode(e.keyCode) == charcode
+      playEmergency()
+      return
 
-      $item.click()
+    character = String.fromCharCode(charcode).toLowerCase()
+    character = "\\\\" if character == "\\" # Escaping woes
 
-    $body.on 'keydown', navHandler
-    activeNavHandlers.push navHandler
-    return
+    if charcode == 27
+      character = "esc"
+    else if charcode == 32
+      character = "space"
 
-impamp.removeNavHandlers = removeNavHandlers = ->
-  $.each activeNavHandlers, (i, handler) ->
-    $('body').off('keydown', handler)
+    if character in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+      $button = $(".page-nav a[data-shortcut='#{character}']")
+    else
+      $button = $(".pad-page.active a[data-shortcut='#{character}']")
 
-  activeNavHandlers = []
+    $button.click()
 
-impamp.addPageHandlers = addPageHandlers = ($page) ->
-  removePadishKeyHandlers()
+    return false
 
-  $body = $('body')
+  $('body').on "keydown", keyHandler
 
-  children = $page.find(".pad .btn")
-  children.each (i, child) ->
-    $child = $(child)
-    shortcut = $child.data('shortcut')
-    charcode = shortcut.toString().toUpperCase().charCodeAt(0)
-
-    handler = (e) ->
-      return unless getCharCode(e.keyCode) == charcode
-
-      $child.click()
-
-    $body.on 'keydown', handler
-    activePadishKeyHandlers.push handler
-
-  enterHandler = (e) ->
-    return unless e.keyCode == 13
-
-    # First stop any existing tracks:
-    $page.find('.padish a[data-shortcut="esc"]').click()
-
-    playEmergency();
-
-  escapeHandler = (e) ->
-    return unless e.keyCode == 27
-    $page.find('.padish a[data-shortcut="esc"]').click()
-
-  spaceHandler  = (e) ->
-    return unless getCharCode(e.keyCode) == 32
-
-    e.preventDefault() # prevent scroll down
-    $page.find('.padish a[data-shortcut="space"]').click()
-
-    return true
-
-  $body.on 'keydown', enterHandler
-  $body.on 'keydown', escapeHandler
-  $body.on 'keydown', spaceHandler
-
-  activePadishKeyHandlers.push enterHandler
-  activePadishKeyHandlers.push escapeHandler
-  activePadishKeyHandlers.push spaceHandler
-
-  return
-
-impamp.removePadishKeyHandlers = removePadishKeyHandlers = ->
-  $.each activePadishKeyHandlers, (i, handler) ->
-    $('body').off('keydown', handler)
-
-  activePadishKeyHandlers = []
+impamp.removeKeyHandler = removeKeyHandler = ->
+  $('body').off "keydown", keyHandler
 
 playEmergency = ->
   $pages =  $()
@@ -125,14 +83,10 @@ getCharCode = (keycode) ->
     when 222
       # '
       return 39
-    when 91
-      # Super key - but it has the same keycode as the charcode for [.
-      # (cause that makes sense...)
-      return 0
     else
       return keycode
 
 $ ->
-  addNavHandlers()
+  addKeyHandler()
 
   return

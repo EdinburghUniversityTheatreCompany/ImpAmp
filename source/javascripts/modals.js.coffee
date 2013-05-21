@@ -23,14 +23,11 @@ impamp.showModal = (title, body, confirmText = "Confirm", actions = true, backdr
   $('body').append $modal
 
   $modal.on 'show', ->
-    impamp.removeNavHandlers()
-    impamp.removePadishKeyHandlers()
+    impamp.removeKeyHandler()
 
   $modal.on 'hidden', ->
     $modal.remove()
-    impamp.addNavHandlers()
-    $activePage = $('.pad-page.active')
-    impamp.addPageHandlers($activePage)
+    impamp.addKeyHandler()
 
   $modal.modal("show")
 
