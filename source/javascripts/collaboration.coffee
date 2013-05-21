@@ -1,7 +1,16 @@
 impamp = window.impamp
 impamp.collaboration = {}
 
-es = new EventSource('/c/stream');
+errorCount = 0
+
+es = new EventSource('/c/stream')
+es.onerror = ->
+  errorCount += 1
+  if errorCount > 10
+    # Give up. It's not happening. Probably because the server doesn't
+    # support it.
+    es.close()
+
 es.onmessage = (e) ->
   data = JSON.parse(e.data)
 

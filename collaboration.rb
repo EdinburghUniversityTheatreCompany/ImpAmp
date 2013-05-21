@@ -9,6 +9,10 @@ class ImpAmpCollaboration < Sinatra::Base
 
   get '/c/stream', :provides => 'text/event-stream' do
     stream :keep_open do |out|
+      # Prevent frequent reconnects - useful if server doesn't support
+      # keep_open.
+      out << "retry: 30000\n\n"
+
       @@connections << out
       out.callback { @@connections.delete(out) }
     end
