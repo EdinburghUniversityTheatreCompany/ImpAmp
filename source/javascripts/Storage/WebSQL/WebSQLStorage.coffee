@@ -99,6 +99,7 @@ class window.WebSQLStorage
       @getPadRow page, key, (oldPadData) =>
         for column in impamp.padColumns
           padData[column] = impamp.getValue(column, padData, oldPadData)
+          padData[column] ||= null
 
         padData.page ||= page
         padData.key  ||= key

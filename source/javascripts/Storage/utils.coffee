@@ -31,7 +31,7 @@ impamp.getValue = (property, newData, oldData) ->
   if property of newData
     return newData[property]
   else
-    return (oldData || {})[property]
+    return (oldData || {})[property] || {}
 
 impamp.padColumns =
   [
