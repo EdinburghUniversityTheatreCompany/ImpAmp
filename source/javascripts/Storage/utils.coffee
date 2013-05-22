@@ -41,6 +41,8 @@ impamp.padColumns =
     "file"
     "filename"
     "filesize"
+    "startTime"
+    "endTime"
     "updatedAt"
   ]
 impamp.pageColumns =

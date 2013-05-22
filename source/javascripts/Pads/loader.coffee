@@ -59,6 +59,8 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
     $pad.data('name', padData.name)
     $pad.data('filename', padData.filename)
     $pad.data('filesize', padData.filesize)
+    $pad.data('startTime', padData.startTime) if padData.startTime?
+    $pad.data('endTime',   padData.endTime)   if padData.endTime?
     $pad.attr('data-downloadurl', "application/octet-stream:#{padData.filename}:#{window.URL.createObjectURL(padData.file)}")
 
     url = window.URL.createObjectURL(padData.file);
@@ -80,6 +82,12 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
 
     $audioElement.on 'timeupdate', (e) ->
       return if audioElement.paused
+
+      endTime = $pad.data("endTime")
+
+      if endTime? && audioElement.currentTime > endTime
+        audioElement.pause()
+        return
 
       $progress_bar = $pad.find(".progress .bar")
       $progress_bar.removeClass "bar-warning"

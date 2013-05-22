@@ -6,7 +6,7 @@ $ ->
     return if $pad.hasClass("error") || $pad.hasClass("disabled")
 
     if e.ctrlKey
-      renamePad($pad)
+      impamp.editPad($pad)
     else
       playPausePad($pad)
 
@@ -17,34 +17,8 @@ playPausePad = ($pad) ->
   $progress = $pad.find(".progress")
 
   if audio.paused
+    audio.currentTime = $pad.data("startTime") || 0
     audio.play()
   else
-    # Playing. Stop and reset
+    # Playing. Stop.
     audio.pause()
-    audio.currentTime = 0
-
-renamePad = ($pad) ->
-  $modal = nameChangeModal()
-
-  $('#renameInput').val($pad.data("name"))
-  $modal.find('.modal-confirm').click (e) ->
-    e.preventDefault()
-    newName = $('#renameInput').val()
-
-    page = impamp.pads.getPage $pad
-    key  = impamp.pads.getKey  $pad
-
-    impamp.storage.done (storage) ->
-      storage.setPad page, key, { name: newName }, ->
-        impamp.loadPad($pad)
-        $modal.modal('hide')
-
-    return false
-
-nameChangeModal = ->
-  title = "Rename Pad"
-  body  = """
-          <input id="renameInput" type="text">
-          """
-
-  return impamp.showModal(title, body, "Rename")

@@ -71,6 +71,8 @@ class window.IndexedDBStorage
       file: null
       filename: null
       filesize: null
+      startTime: null
+      endTime:   null
     , callback
 
   #
@@ -201,6 +203,8 @@ class window.IndexedDBStorage
               file: file
               filename: row.filename
               filesize: row.filesize
+              startTime: row.startTime
+              endTime:   row.endTime
             , ->
               deferred.resolve()
             , row.updatedAt

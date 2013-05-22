@@ -37,8 +37,10 @@ sync = ->
         filename  = $pad.data('filename')
         filesize  = $pad.data('filesize')
         updatedAt = $pad.data('updatedAt')
+        startTime = $pad.data('startTime')
+        endTime   = $pad.data('endTime')
 
-        if serverPad.name != name || serverPad.filename != filename || `serverPad.filesize != filesize`
+        if serverPad.name != name || serverPad.filename != filename || `serverPad.filesize != filesize` || `serverPad.startTime != startTime` || `serverPad.endTime != endTime`
           updates.push updatePad($pad, serverPad)
         else if serverPad.filename? && `serverPad.updatedAt != updatedAt`
           updates.push updatePad($pad, serverPad)

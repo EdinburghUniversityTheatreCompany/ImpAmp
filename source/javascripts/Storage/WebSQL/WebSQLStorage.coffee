@@ -13,6 +13,8 @@ class window.WebSQLStorage
       filename: row.filename
       filesize: row.filesize
       updatedAt: row.updatedAt
+      startTime: row.startTime
+      endTime:   row.endTime
     return data
 
   constructor: ->
@@ -48,6 +50,14 @@ class window.WebSQLStorage
     migrator.migration "1.1", "1.2", (tx) ->
       tx.executeSql """
                     ALTER TABLE Pages ADD emergencies
+                    """
+
+    migrator.migration "1.2", "1.3", (tx) ->
+      tx.executeSql """
+                    ALTER TABLE Pads ADD startTime
+                    """
+      tx.executeSql """
+                    ALTER TABLE Pads ADD endTime
                     """
 
     migrator.migrate ->
@@ -100,9 +110,9 @@ class window.WebSQLStorage
 
         @db.transaction (tx) ->
           tx.executeSql """
-                        INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
+                        INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """
-          , [padData.page, padData.key, padData.name, padData.file, padData.filename, padData.filesize, updatedAt],
+          , [padData.page, padData.key, padData.name, padData.file, padData.filename, padData.filesize, updatedAt, padData.startTime, padData.endTime],
             callback?()
           , (tx, error) ->
             throw error
@@ -233,9 +243,9 @@ class window.WebSQLStorage
                   transactions.push(deferred.promise())
 
                   tx.executeSql """
-                                INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?)
+                                INSERT OR REPLACE INTO Pads VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                 """
-                  , [row.page, row.key, row.name, row.file, row.filename, row.filesize, row.updatedAt]
+                  , [row.page, row.key, row.name, row.file, row.filename, row.filesize, row.updatedAt, row.startTime, row.endTime]
                   , ->
                     deferred.resolve()
                   , (tx, error) ->
