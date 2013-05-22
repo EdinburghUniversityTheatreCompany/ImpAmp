@@ -95,11 +95,10 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
 
       $progress_text = $pad.find(".progress > span")
 
-      percent = (audioElement.currentTime / audioElement.duration) * 100
       $progress_bar.css
-        width: percent + "%"
+        width: impamp.pads.getPercent($pad, audioElement) + "%"
 
-      $progress_text.text(Math.round(audioElement.duration - audioElement.currentTime))
+      $progress_text.text impamp.pads.getRemaining($pad, audioElement)
 
       impamp.collaboration.timeupdate page, key, playId, audioElement.currentTime
 

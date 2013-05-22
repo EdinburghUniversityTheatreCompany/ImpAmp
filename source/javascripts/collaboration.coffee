@@ -35,12 +35,11 @@ es.onmessage = (e) ->
       $progress_bar.addClass "bar-grey"
       $progress.show()
 
-      percent = (data.time / audioElement.duration) * 100
       $progress_bar.css
-        width: percent + "%"
+        width: impamp.pads.getPercent($pad, audioElement, data.time) + "%"
 
       $progress_text = $pad.find(".progress > span")
-      $progress_text.text(Math.round(audioElement.duration - data.time))
+      $progress_text.text impamp.pads.getRemaining($pad, audioElement, data.time)
 
       impamp.updateNowCollaborating($pad, data.playId, data.time)
 

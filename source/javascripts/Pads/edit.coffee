@@ -25,8 +25,8 @@ impamp.editPad = ($pad) ->
     e.preventDefault()
 
     newName   = $('#renameInput').val()
-    startTime = (wavesurfer.drawer.markers["start"] || {}).position
-    endTime   = (wavesurfer.drawer.markers["end"]   || {}).position
+    startTime = (wavesurfer.drawer.markers["start"] || {position: null}).position
+    endTime   = (wavesurfer.drawer.markers["end"]   || {position: null}).position
 
     page = impamp.pads.getPage $pad
     key  = impamp.pads.getKey  $pad

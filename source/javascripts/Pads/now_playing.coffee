@@ -15,7 +15,7 @@ impamp.addNowPlaying = ($pad) ->
   $audioElement = $pad.find("audio")
   audioElement = $audioElement[0]
   $audioElement.on 'timeupdate', (e) ->
-    updateProgressBar($item, audioElement.currentTime, audioElement.duration)
+    updateProgressBar($item, $pad, audioElement.currentTime)
 
   $nowPlaying.append $item
   $item.fadeIn(1000)
@@ -47,21 +47,22 @@ impamp.updateNowCollaborating = ($pad, playId, time) ->
   audioElement = $pad.find("audio")[0]
   $item = $(".now-playing-item[data-playId='#{playId.replace("\\", "\\\\")}']")
 
-  updateProgressBar($item, time, audioElement.duration)
+  updateProgressBar($item, $pad, time)
 
 impamp.removeNowCollaborating = (playId) ->
   $item = $(".now-playing-item[data-playId='#{playId.replace("\\", "\\\\")}']")
   removeItem($item)
 
-updateProgressBar = ($item, time, duration) ->
+updateProgressBar = ($item, $pad, time) ->
+  audioElement = $pad.find("audio")[0]
+
   $progress_bar  = $item.find(".progress .bar")
   $progress_text = $item.find(".progress > span")
 
-  percent = (time / duration) * 100
   $progress_bar.css
-    width: percent + "%"
+    width: impamp.pads.getPercent($pad, audioElement, time) + "%"
 
-  $progress_text.text(Math.round(duration - time))
+  $progress_text.text impamp.pads.getRemaining($pad, audioElement, time)
 
 removeItem = ($item) ->
   $item.find(".progress").hide()
