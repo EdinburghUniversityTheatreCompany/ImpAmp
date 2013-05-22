@@ -59,8 +59,8 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
     $pad.data('name', padData.name)
     $pad.data('filename', padData.filename)
     $pad.data('filesize', padData.filesize)
-    $pad.data('startTime', padData.startTime) if padData.startTime?
-    $pad.data('endTime',   padData.endTime)   if padData.endTime?
+    $pad.data('startTime', padData.startTime)
+    $pad.data('endTime',   padData.endTime)
     $pad.attr('data-downloadurl', "application/octet-stream:#{padData.filename}:#{window.URL.createObjectURL(padData.file)}")
 
     url = window.URL.createObjectURL(padData.file);
@@ -81,7 +81,7 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
     playId = null
 
     $audioElement.on 'timeupdate', (e) ->
-      return if audioElement.paused
+      return if audioElement.paused || playId == null
 
       endTime = $pad.data("endTime")
 
@@ -105,10 +105,11 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
     $progress = $pad.find(".progress")
 
     $audioElement.on 'play', (e) ->
+      playId = (page + key + (new Date()).getTime())
+
       $progress.show()
       impamp.addNowPlaying($pad)
 
-      playId = (page + key + (new Date()).getTime())
       impamp.collaboration.play page, key, playId, audioElement.currentTime
 
     pauseEndHandler = (e) ->
