@@ -1,7 +1,7 @@
 impamp = window.impamp
 impamp.collaboration = {}
 
-impamp.collaboration.colour = localStorage["collaboration.colour"]
+impamp.collaboration.colour = localStorage["collaboration.colour"] if localStorage?
 
 $ ->
   $colourInput = $('#colourBtn input')
