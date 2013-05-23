@@ -31,6 +31,12 @@ es.onmessage = (e) ->
     when "play", "timeupdate"
       if $(".now-playing-item[data-playId='#{data.playId.replace("\\", "\\\\")}']").length == 0
         impamp.addNowCollaborating($pad, data.playId)
+        setTimeout( ->
+          # If it doesn't get the stop message, fade out 5 seconds after it
+          # was meant to.
+          $progress.hide()
+          impamp.removeNowCollaborating(data.playId)
+        , (audioElement.duration + 5) * 1000)
 
       $progress_bar.addClass "bar-grey"
       $progress.show()
