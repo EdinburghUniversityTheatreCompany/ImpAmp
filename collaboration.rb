@@ -11,7 +11,7 @@ class ImpAmpCollaboration < Sinatra::Base
     stream :keep_open do |out|
       # Prevent frequent reconnects - useful if server doesn't support
       # keep_open.
-      out << "retry: 30000\n\n"
+      out << "retry: 5000\n\n"
 
       @@connections << out
 
