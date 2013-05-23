@@ -1,6 +1,6 @@
 $ ->
   $('.page-nav [href^="#page"]').click (e) ->
-    return unless e.ctrlKey
+    return unless e.shiftKey
     e.preventDefault()
 
     $pageNav = $(e.currentTarget)

@@ -5,7 +5,7 @@ $ ->
     $pad = $(e.currentTarget).closest(".pad")
     return if $pad.hasClass("error") || $pad.hasClass("disabled")
 
-    if e.ctrlKey
+    if e.shiftKey
       impamp.editPad($pad)
     else
       playPausePad($pad)
