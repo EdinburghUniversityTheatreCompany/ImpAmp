@@ -58,8 +58,8 @@ lastUpdate = null
 impamp.collaboration.timeupdate = (page, key, playId, time) ->
   now = new Date()
 
-  # Update max once a second
-  return if (now - lastUpdate) < 1000
+  # Update max twice a second
+  return if (now - lastUpdate) < 500
   lastUpdate = now
 
   $.post "/c/timeupdate",
