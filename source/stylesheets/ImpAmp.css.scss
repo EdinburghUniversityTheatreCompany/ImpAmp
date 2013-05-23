@@ -201,6 +201,19 @@ hr {
   }
 }
 
+#colourBtn {
+  padding-left: 5px;
+  padding-right: 5px;
+
+  input {
+    margin-bottom: 0;
+    padding: 0;
+    width: 30px;
+    height: 1.2em;
+    margin-top: -2px;
+  }
+}
+
 // Give the tabs something to sit on
 .nav-tabs {
   border-bottom: 1px solid rgba(226, 107, 24, 1);

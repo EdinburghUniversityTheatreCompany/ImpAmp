@@ -23,30 +23,31 @@ class ImpAmpCollaboration < Sinatra::Base
   end
 
   post '/c/play' do
-    send_message("play", params[:page], params[:key], params[:playId], params[:time])
+    send_message("play", params[:page], params[:key], params[:playId], params[:time], params[:colour])
 
     return 204
   end
 
   post '/c/timeupdate' do
-    send_message("timeupdate", params[:page], params[:key], params[:playId], params[:time])
+    send_message("timeupdate", params[:page], params[:key], params[:playId], params[:time], params[:colour])
 
     return 204
   end
 
   post '/c/pause' do
-    send_message("pause", params[:page], params[:key], params[:playId], params[:time])
+    send_message("pause", params[:page], params[:key], params[:playId], params[:time], params[:colour])
 
     return 204
   end
 
-  def send_message(type, page, key, playId, time)
+  def send_message(type, page, key, playId, time, colour)
     message = {
       type: type,
       page: page,
       key:  key,
       playId: playId,
-      time: time
+      time:   time,
+      colour: colour
     }
 
     @@connections.each do |out|

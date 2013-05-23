@@ -1,6 +1,15 @@
 impamp = window.impamp
 impamp.collaboration = {}
 
+impamp.collaboration.colour = localStorage["collaboration.colour"]
+
+$ ->
+  $colourInput = $('#colourBtn input')
+  $colourInput.val(impamp.collaboration.colour)
+  $colourInput.on "change", ->
+    impamp.collaboration.colour = $colourInput.val()
+    localStorage["collaboration.colour"] = impamp.collaboration.colour
+
 errorCount = 0
 
 es = new EventSource('/c/stream')
@@ -30,7 +39,7 @@ es.onmessage = (e) ->
   switch data.type
     when "play", "timeupdate"
       if $(".now-playing-item[data-playId='#{data.playId.replace("\\", "\\\\")}']").length == 0
-        impamp.addNowCollaborating($pad, data.playId)
+        impamp.addNowCollaborating($pad, data.playId, data.colour)
         setTimeout( ->
           # If it doesn't get the stop message, fade out 5 seconds after it
           # was meant to.
@@ -38,7 +47,15 @@ es.onmessage = (e) ->
           impamp.removeNowCollaborating(data.playId)
         , (audioElement.duration + 5) * 1000)
 
-      $progress_bar.addClass "bar-grey"
+      if data.colour?
+        bottomColour = data.colour
+        topColour    = impamp.increaseBrightness(data.colour)
+
+        gradient = "linear-gradient(to bottom, #{topColour}, #{bottomColour})"
+
+        $progress_bar.css("background-image", gradient)
+      else
+        $progress_bar.addClass "bar-grey"
       $progress.show()
 
       $progress_bar.css
@@ -58,7 +75,8 @@ impamp.collaboration.play = (page, key, playId, time) ->
     page: page
     key:  key
     playId: playId
-    time: time
+    time:   time
+    colour: impamp.collaboration.colour
 
 lastUpdate = null
 impamp.collaboration.timeupdate = (page, key, playId, time) ->
@@ -72,11 +90,13 @@ impamp.collaboration.timeupdate = (page, key, playId, time) ->
     page: page
     key:  key
     playId: playId
-    time: time
+    time:   time
+    colour: impamp.collaboration.colour
 
 impamp.collaboration.pause = (page, key, playId, time) ->
   $.post "/c/pause",
     page: page
     key:  key
     playId: playId
-    time: time
+    time:   time
+    colour: impamp.collaboration.colour

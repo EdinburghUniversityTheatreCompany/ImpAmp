@@ -29,7 +29,7 @@ impamp.removeNowPlaying = ($pad) ->
   $item = $(".now-playing-item[data-pad-page='#{page}'][data-pad-key='#{key}']")
   removeItem($item)
 
-impamp.addNowCollaborating = ($pad, playId) ->
+impamp.addNowCollaborating = ($pad, playId, colour) ->
   $item = $('.now-playing-item').first().clone()
   $item.attr("data-playId", playId)
 
@@ -38,7 +38,15 @@ impamp.addNowCollaborating = ($pad, playId) ->
   $item.find(".name").text($pad.find(".name").text())
   $item.addClass "disabled"
 
-  $item.find(".progress .bar").addClass "bar-grey"
+  if colour?
+    bottomColour = colour
+    topColour    = impamp.increaseBrightness(colour)
+
+    gradient = "linear-gradient(to bottom, #{topColour}, #{bottomColour})"
+
+    $item.find(".progress .bar").css("background-image", gradient)
+  else
+    $item.find(".progress .bar").addClass "bar-grey"
 
   $nowPlaying.append $item
   $item.fadeIn(1000)

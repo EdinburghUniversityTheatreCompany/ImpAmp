@@ -21,4 +21,5 @@
 //= require keyboard
 //= require sync
 //= require version
+//= require colourUtils
 //= require collaboration
