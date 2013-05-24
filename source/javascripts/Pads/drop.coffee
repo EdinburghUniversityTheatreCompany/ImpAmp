@@ -70,14 +70,18 @@ movePad = ($new_pad, ia_move_data) ->
   old_page = ia_move_data.split(" ")[0]
   old_key  = ia_move_data.split(" ")[1]
 
-  $old_pad = $(".pad-page.active a[data-shortcut='#{impamp.pads.escapeKey(old_key)}']").closest(".pad")
-  $old_pad.addClass "disabled"
-
-  $old_pad.find(".name").text "Please Wait..."
-  $new_pad.find(".name").text "Please Wait..."
-
   new_page = impamp.pads.getPage $new_pad
   new_key  = impamp.pads.getKey  $new_pad
+
+  if old_page == new_page && old_key == new_key
+    # Accident. Get out.
+    return
+
+  $old_pad = $(".pad-page.active a[data-shortcut='#{impamp.pads.escapeKey(old_key)}']").closest(".pad")
+
+  $old_pad.addClass "disabled"
+  $old_pad.find(".name").text "Please Wait..."
+  $new_pad.find(".name").text "Please Wait..."
 
   impamp.storage.done (storage) ->
     # First, get rid if there is a pad there already.
