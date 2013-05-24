@@ -8,16 +8,27 @@ impamp.editPad = ($pad) ->
   $('#renameInput').val($pad.data("name"))
 
   $modal.on "shown", ->
-    wavesurfer = Object.create(WaveSurfer)
-    wavesurfer.init
+    wsOptions =
       canvas: $('#wavesurfer')[0]
       waveColor: 'violet'
       progressColor: 'purple'
 
-    wavesurfer.load(audioElement.src);
+    if not wavesurfer?
+      wavesurfer = Object.create(WaveSurfer)
+      wavesurfer.init wsOptions
+    else
+      # Most of it's still valid. Just update the drawer and rebind click.
+      wavesurfer.drawer.init wsOptions
+      wavesurfer.bindClick wsOptions.canvas, (percents) ->
+        wavesurfer.seekTo(percents)
+
+    wavesurfer.load(audioElement.src)
 
     startTime = $pad.data("startTime")
     endTime   = $pad.data("endTime")
+
+  $modal.on "hidden", ->
+    wavesurfer.pause()
 
   $modal.find(".btn").on "click", editClickHandler
 
@@ -30,8 +41,6 @@ impamp.editPad = ($pad) ->
 
     page = impamp.pads.getPage $pad
     key  = impamp.pads.getKey  $pad
-
-    wavesurfer.pause()
 
     impamp.storage.done (storage) ->
       storage.setPad page, key,
