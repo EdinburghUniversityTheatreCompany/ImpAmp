@@ -92,6 +92,7 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
       $progress_bar = $pad.find(".progress .bar")
       $progress_bar.removeClass "bar-warning"
       $progress_bar.removeClass "bar-grey"
+      $progress_bar.css "background-image", ""
 
       $progress_text = $pad.find(".progress > span")
 
@@ -106,6 +107,7 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
 
     $audioElement.on 'play', (e) ->
       playId = (page + key + (new Date()).getTime())
+      $pad.data "playId", playId
 
       $progress.show()
       impamp.addNowPlaying($pad)
@@ -114,8 +116,12 @@ impamp.loadPad =  loadPad  = ($pad, storage, callback) ->
 
     pauseEndHandler = (e) ->
       $progress.hide()
+
       impamp.removeNowPlaying($pad)
       impamp.collaboration.pause page, key, playId, audioElement.currentTime
+
+      playId = null
+      $pad.data "playId", playId
 
     $audioElement.on 'pause', pauseEndHandler
     $audioElement.on 'ended', pauseEndHandler

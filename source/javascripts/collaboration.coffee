@@ -23,15 +23,17 @@ es.onerror = ->
 es.onmessage = (e) ->
   data = JSON.parse(e.data)
 
+  return unless data.playId?
+
   data.key = impamp.pads.escapeKey(data.key)
 
   # Find the pad
   $page = $("#page_#{data.page}")
   $pad = $page.find(".pad [data-shortcut='#{data.key}']").closest(".pad")
 
-  audioElement = $pad.find("audio")[0]
+  return if data.playId == $pad.data "playId"
 
-  return unless audioElement.paused
+  audioElement = $pad.find("audio")[0]
 
   $progress = $pad.find(".progress")
   $progress_bar = $pad.find(".progress .bar")
@@ -47,6 +49,11 @@ es.onmessage = (e) ->
           impamp.removeNowCollaborating(data.playId)
         , (audioElement.duration + 5) * 1000)
 
+      impamp.updateNowCollaborating($pad, data.playId, data.time)
+
+      return unless audioElement.paused
+
+      # Show the pad's progress bar in the remote colour
       if data.colour?
         bottomColour = data.colour
         topColour    = impamp.increaseBrightness(data.colour)
@@ -64,11 +71,11 @@ es.onmessage = (e) ->
       $progress_text = $pad.find(".progress > span")
       $progress_text.text impamp.pads.getRemaining($pad, audioElement, data.time)
 
-      impamp.updateNowCollaborating($pad, data.playId, data.time)
-
     when "pause"
-      $progress.hide()
       impamp.removeNowCollaborating(data.playId)
+
+      return unless audioElement.paused
+      $progress.hide()
 
 impamp.collaboration.play = (page, key, playId, time) ->
   $.post "/c/play",
