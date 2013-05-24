@@ -62,6 +62,7 @@ editClickHandler = (e) ->
 
   switch action
     when "play"
+      $button.toggleClass "active"
       wavesurfer.playPause();
 
     when "start-mark"
