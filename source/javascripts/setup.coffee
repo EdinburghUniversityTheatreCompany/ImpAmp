@@ -1,5 +1,10 @@
+# Browser specifics
 window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder ||
                      window.MozBlobBuilder || window.MSBlobBuilder;
+
+# If localStorage isn't defined, make it look blank.
+window.localStorage ||= {}
+
 window.impamp = impamp = {};
 
 impamp.storageTypes =

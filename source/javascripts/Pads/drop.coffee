@@ -1,5 +1,9 @@
-$ ->
+impamp.locked = localStorage["locked"] || false
 
+if typeof impamp.locked == "string"
+  impamp.locked = JSON.parse impamp.locked
+
+$ ->
   # prevent browser from opening the file if we missed a pad.
   $(window).on "dragover", (e) ->
     e.preventDefault()
@@ -13,6 +17,12 @@ $ ->
     $pad = $(pad)
 
     $pad.on "dragstart", (e) ->
+      if impamp.locked
+        e.preventDefault()
+        flashLock()
+
+        return false
+
       page = impamp.pads.getPage $pad
       key  = impamp.pads.getKey  $pad
 
@@ -33,17 +43,21 @@ $ ->
       return false
 
     $pad.on "drop", (e) ->
-      #prevent browser from open the file when drop off
+      # Prevent browser from opening the file on drop.
       e.stopPropagation()
       e.preventDefault()
       $pad.removeClass "hover"
+
+      # if locked, flash the lock button and return
+      if impamp.locked
+        flashLock()
+        return false
 
       ia_move_data = e.originalEvent.dataTransfer.getData("application/x-impamp-move");
       unless ia_move_data == ""
         movePad($pad, ia_move_data)
         return false
 
-      #retrieve uploaded files data
       files = e.originalEvent.dataTransfer.files
       if files.length > 0
         file = files[0]
@@ -94,3 +108,45 @@ movePad = ($new_pad, ia_move_data) ->
         impamp.loadPad($old_pad)
         impamp.loadPad($new_pad)
 
+$ ->
+  $lockBtn = $('#lockBtn')
+  $icon    = $lockBtn.find "i"
+
+  updateLock(impamp.locked)
+
+  $lockBtn.click ->
+    impamp.locked = not impamp.locked
+    localStorage["locked"] = impamp.locked
+
+    updateLock()
+
+updateLock = ->
+  $lockBtn = $('#lockBtn')
+  $icon    = $lockBtn.find "i"
+
+  if impamp.locked == true
+    # Lock
+    $icon.removeClass "icon-unlock"
+    $lockBtn.addClass "active"
+    $icon.addClass    "icon-lock"
+  else
+    # Unlock
+    $icon.removeClass "icon-lock"
+    $lockBtn.removeClass "active"
+    $icon.addClass    "icon-unlock"
+
+flashCount = 0
+flashLock = ->
+  $lockBtn = $('#lockBtn')
+
+  flashCount += 1;
+  if flashCount >= 2
+    $lockBtn.popover
+      title:     "ImpAmp Locked"
+      content:   "Click the lock icon allow pads to be changed or moved."
+      placement: "bottom"
+    $lockBtn.popover("show")
+    $lockBtn.on "click", ->
+      $lockBtn.popover("hide")
+
+  $lockBtn.fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)

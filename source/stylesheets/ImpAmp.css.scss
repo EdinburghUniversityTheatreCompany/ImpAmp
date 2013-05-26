@@ -11,6 +11,7 @@ body:before {
   left: 0px;
   top: 0px;
 
+  color: #efefef;
   content: 'ImpAmp2';
   font-size: 32px;
   margin-top: -25px;
@@ -46,12 +47,8 @@ hr {
   border-bottom: 1px solid #e26b18;
 }
 
-.modal-header h3 {
-  color: #333333;
-}
-
-.modal-body {
-  color: #333333;
+.pageNav {
+  color: #efefef;
 }
 
 #pad-pages {
@@ -155,6 +152,7 @@ hr {
   overflow: hidden;
 
   h2 {
+    color: #efefef;
     height: 1.6em;
   }
 }
