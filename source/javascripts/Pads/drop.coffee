@@ -143,10 +143,11 @@ flashLock = ->
   if flashCount >= 2
     $lockBtn.popover
       title:     "ImpAmp Locked"
-      content:   "Click the lock icon allow pads to be changed or moved."
+      content:   "Click the lock icon to allow pads to be changed or moved."
       placement: "bottom"
     $lockBtn.popover("show")
     $lockBtn.on "click", ->
       $lockBtn.popover("hide")
+      flashCount = -1
 
   $lockBtn.fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
