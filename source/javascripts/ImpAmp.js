@@ -3,10 +3,10 @@
 //= require setup
 //= require bootstrap
 //= require modernizr
+//= require wavesurfer/observer
 //= require wavesurfer/wavesurfer
-//= require wavesurfer/audio
-//= require wavesurfer/drawer
 //= require wavesurfer/webaudio
+//= require wavesurfer/drawer
 //= require appCache
 //= require modals
 //= require_tree ./FeatureDetection
