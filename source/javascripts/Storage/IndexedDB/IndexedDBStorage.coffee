@@ -116,7 +116,7 @@ class window.IndexedDBStorage
 
     promises = []
 
-    trans = @db.transaction(["pad, page"], "readonly")
+    trans = @db.transaction(["pad", "page"], "readonly")
 
     pageStore = trans.objectStore("page")
     padStore  = trans.objectStore("pad")
