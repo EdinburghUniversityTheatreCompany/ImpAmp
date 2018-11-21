@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'json'
+gem 'therubyracer', :platforms => :ruby
 
 gem 'middleman'
 gem 'middleman-livereload'
