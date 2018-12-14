@@ -41,6 +41,8 @@ activate :livereload
 
 activate :directory_indexes
 
+ignore /.*\/[\w,\s-]+\.md/ # ignore .md files
+
 set :debug_assets, true
 
 set :css_dir, 'stylesheets'
