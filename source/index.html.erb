@@ -9,6 +9,8 @@
     <%= stylesheet_link_tag 'ImpAmp' %>
 
     <%= javascript_include_tag 'ImpAmp' %>
+    <%= javascript_include_tag 'sw-appcache-behavior/build/client-runtime', :'data-service-worker' => 'service-worker.js' %>
+    <%= javascript_include_tag 'sw-appcache-behavior/build/appcache-behavior-import' %>
   </head>
 
   <body>

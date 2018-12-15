@@ -50,7 +50,8 @@ GEM
       url_mount (~> 0.2.1)
     i18n (0.6.1)
     journey (1.0.4)
-    json (1.8.3)
+    json (1.8.5)
+    libv8 (3.16.14.19)
     listen (0.7.3)
     maruku (0.6.1)
       syntax (>= 1.0.0)
@@ -124,6 +125,7 @@ GEM
       ffi (>= 0.5.0)
     rdoc (3.12.2)
       json (~> 1.4)
+    ref (2.0.0)
     sass (3.2.9)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -144,6 +146,9 @@ GEM
       sprockets (~> 2.0)
       tilt (~> 1.1)
     syntax (1.0.0)
+    therubyracer (0.12.3)
+      libv8 (~> 3.16.14.15)
+      ref
     thin (1.6.4)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -167,7 +172,8 @@ DEPENDENCIES
   middleman-livereload
   rb-inotify
   sass-rails
+  therubyracer
   thin
 
 BUNDLED WITH
-   1.10.6
+   1.16.1

@@ -1,0 +1,27 @@
+importScripts('javascripts/sw-appcache-behavior/build/appcache-behavior-import.js')
+
+self.addEventListener('install', (event) =>
+  event.waitUntil(self.skipWaiting()));
+self.addEventListener('activate', () => self.clients.claim());
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(goog.appCacheBehavior.fetch(event));
+});
+
+self.addEventListener('downloading', (event) => {
+  impamp.sync.enabled = false;
+  impamp.setSyncButton("info-sign", "Updating ImpAmp...");
+});
+
+self.addEventListener('cached', (event) => {
+  impamp.sync.enabled = true;
+  impamp.setSyncButton("time", "Waiting for Sync");
+});
+
+self.addEventListener('updateready', (event) => {
+  $('#syncBtn').unbind("click");
+  $('#syncBtn').addClass("disabled");
+
+  goog.appCacheBehavior.swapCache();
+  impamp.setSyncButton("remove-sign", "Updates Ready. Please refresh page to enable sync.");
+});
