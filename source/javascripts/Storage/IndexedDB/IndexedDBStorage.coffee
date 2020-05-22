@@ -128,7 +128,7 @@ class window.IndexedDBStorage
         dbPage = result.value
         dbPage.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
 
-        page = data.pages[dbPage.pageNo] || {}
+        page = data.pages[dbPage.pageNo] || {pads: {}}
 
         page.name        = dbPage.name
         page.emergencies = dbPage.emergencies
@@ -142,29 +142,30 @@ class window.IndexedDBStorage
     padCursor = padStore.openCursor()
     padCursor.onsuccess = (e) ->
       result = e.target.result
-      if result and result.value.file
-        pad = result.value
-        pad.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
+      if result
+        if result.value.file
+          pad = result.value
+          pad.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
 
-        deferred = $.Deferred()
-        promises.push(deferred.promise())
+          deferred = $.Deferred()
+          promises.push(deferred.promise())
 
-        reader = new FileReader();
-        reader.onload = (e) ->
-          page = data.pages[pad.page] || {}
+          reader = new FileReader();
+          reader.onload = (e) ->
+            page = data.pages[pad.page] || {pads: {}}
 
-          page[pad.key] = pad
-          pad.file = e.target.result
+            page.pads[pad.key] = pad
+            pad.file = e.target.result
 
-          data.pages[pad.page] = page
+            data.pages[pad.page] = page
 
-          deferred.resolve()
-          return
-        reader.onerror = (e) ->
-          deferred.reject()
-          throw e
-          return
-        reader.readAsDataURL(pad.file);
+            deferred.resolve()
+            return
+          reader.onerror = (e) ->
+            deferred.reject()
+            throw e
+            return
+          reader.readAsDataURL(pad.file);
 
         result.continue();
         return
@@ -173,6 +174,7 @@ class window.IndexedDBStorage
       waiting = $.when.apply($, promises)
       waiting.then ->
         console.log "One done"
+        alert("I am working please stay on the page for at least 2 minutes before giving up. If I crash the tab try and free up some ram")
         return
       waiting.done ->
         json = JSON.stringify(data)
@@ -186,37 +188,36 @@ class window.IndexedDBStorage
       data = JSON.parse(e.target.result)
 
       promises = []
+      complete = 0
       for num, page of data.pages
         @setPage num,
           name:        page.name
           emergencies: page.emergencies
         , null, page.updatedAt
-        for key, row of page
+        for key, row of page.pads
           ((row, me) ->
-            deferred = $.Deferred()
-            promises.push(deferred.promise())
+            promises.push( new Promise( (resolve,reject) ->
+              file = impamp.convertDataURIToBlob row.file
 
-            file = impamp.convertDataURIToBlob row.file
-
-            me.setPad row.page, row.key,
-              name: row.name
-              file: file
-              filename: row.filename
-              filesize: row.filesize
-              startTime: row.startTime
-              endTime:   row.endTime
-            , ->
-              deferred.resolve()
-            , row.updatedAt
+              me.setPad row.page, row.key,
+                name: row.name
+                file: file
+                filename: row.filename
+                filesize: row.filesize
+                startTime: row.startTime
+                endTime:   row.endTime
+              , ->
+                resolve()
+              , row.updatedAt
+            ).then( ->
+              complete += 1
+              progress?(complete, promises.length)
+              return
+            ))
           )(row, this)
 
-      waiting  = $.when.apply($, promises)
-      complete = 0
-      waiting.then ->
-        complete += 1
-        progress?(complete, promises.length)
-        return
-      waiting.done ->
+      Promise.all(promises).then( ->
         callback?()
         return
+      )
     reader.readAsText(file);
