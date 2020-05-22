@@ -5,7 +5,7 @@ self.addEventListener('install', (event) =>
 self.addEventListener('activate', () => self.clients.claim());
 
 self.addEventListener('fetch', (event) => {
-  if (new URL(event.request.url).pathname.startsWith("/c/")){
+  if (event.request.method == 'POST' || new URL(event.request.url).pathname.startsWith("/c/")){
     return
   }
   event.respondWith(goog.appCacheBehavior.fetch(event));
