@@ -42,8 +42,10 @@ class window.IndexedDBStorage
   # @param callback  A function with no arguments to call when the pad has been set.
   # @param updatedAt Note that this parameter (which defaults to the current time) will
   #                  override any updatedAt passed in padData.
-  setPad: (page, key, padData, callback, updatedAt = new Date().getTime()) ->
+  setPad: (page, key, padData, callback, updatedAt = new Date().getTime(), fromRestore= false) ->
     @getPad page, key, (oldPadData) =>
+      if not oldPadData.file && fromRestore
+        updatedAt = new Date().getTime()
       for column in impamp.padColumns
         padData[column] = impamp.getValue(column, padData, oldPadData)
 
@@ -209,6 +211,7 @@ class window.IndexedDBStorage
               , ->
                 resolve()
               , row.updatedAt
+              , true
             ).then( ->
               complete += 1
               progress?(complete, promises.length)

@@ -2,6 +2,7 @@ fs = impamp.filesystem
 
 $ ->
   $("#importBtn").click ->
+    alert("This will overwrite blank pads or ones that are older than the data from this save file. Make sure you are synced with the server as if not you risk overwriting pads once you do sync with the server")
     $modal = importModal()
 
     $modal.find('.modal-confirm').click ->
