@@ -19,18 +19,18 @@ class ImpAmpServer < Sinatra::Base
     key = "." if key == "period"
     key = "/" if key == "slash"
 
+    pad = JSON.parse(request.body.read)
+
+    lock = File.open('impamp_server.json')
+    lock.flock(File::LOCK_EX)
     data = JSON.parse( IO.read('impamp_server.json') )
 
     pages = data["pages"]
     page = pages[page_no] || {}
 
-    pad = JSON.parse(request.body.read)
-
     page[key]     = pad
     data["pages"][page_no] = page
 
-    lock = File.open('impamp_server.json')
-    lock.flock(File::LOCK_EX)
     File.open('impamp_server.json','w+') do |f|
       f.write data.to_json
     end
@@ -41,6 +41,9 @@ class ImpAmpServer < Sinatra::Base
   end
 
   post '/page/:page_no' do |page_no|
+    lock = File.open('impamp_server.json')
+    lock.flock(File::LOCK_EX)
+
     data = JSON.parse( IO.read('impamp_server.json') )
 
     pages = data["pages"]
@@ -50,8 +53,6 @@ class ImpAmpServer < Sinatra::Base
 
     data["pages"][page_no] = page
 
-    lock = File.open('impamp_server.json')
-    lock.flock(File::LOCK_EX)
     File.open('impamp_server.json','w+') do |f|
       f.write data.to_json
     end
