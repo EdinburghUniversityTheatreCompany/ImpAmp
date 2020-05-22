@@ -142,7 +142,7 @@ class window.IndexedDBStorage
     padCursor = padStore.openCursor()
     padCursor.onsuccess = (e) ->
       result = e.target.result
-      if result
+      if result and result.value.file
         pad = result.value
         pad.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
 
