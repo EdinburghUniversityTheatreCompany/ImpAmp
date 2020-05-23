@@ -90,13 +90,19 @@ class window.IndexedDBStorage
       trans = @db.transaction(["page"], "readwrite")
       store = trans.objectStore("page")
 
-      pageData.updatedAt = updatedAt
-      pageData.pageNo ||= pageNo
+      filteredPageData = Object.keys(pageData)
+        .filter((key) -> impamp.pageColumns.includes(key))
+        .reduce((obj, key) ->
+            obj[key] = pageData[key];
+            return obj;
+          , {});
+      filteredPageData.updatedAt = updatedAt
+      filteredPageData.pageNo ||= pageNo
 
       for column in impamp.pageColumns
-        pageData[column] = impamp.getValue(column, pageData, oldPageData)
+        filteredPageData[column] = impamp.getValue(column, filteredPageData, oldPageData)
 
-      request = store.put(pageData)
+      request = store.put(filteredPageData)
       request.onsuccess = (e) ->
         callback?()
 
