@@ -44,7 +44,7 @@ class window.IndexedDBStorage
   #                  override any updatedAt passed in padData.
   setPad: (page, key, padData, callback, updatedAt = new Date().getTime(), fromRestore= false) ->
     @getPad page, key, (oldPadData) =>
-      if not oldPadData.file && fromRestore
+      if oldPadData && not oldPadData.file && fromRestore
         updatedAt = new Date().getTime()
       for column in impamp.padColumns
         padData[column] = impamp.getValue(column, padData, oldPadData)
@@ -169,8 +169,7 @@ class window.IndexedDBStorage
             return
           reader.readAsDataURL(pad.file);
 
-        result.continue();
-        return
+        return result.continue();
 
     trans.oncomplete = ->
       waiting = $.when.apply($, promises)
