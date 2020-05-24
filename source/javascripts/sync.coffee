@@ -63,10 +63,10 @@ sync = ->
         setSyncButton("ok", "Sync Complete")
       syncWait.fail ->
         syncInProgress = false
-        setSyncButton("exclamation-sign", "Sync Error")
+        setSyncButton("exclamation-sign", "Sync Error: can't update server")
     error: ->
       syncInProgress = false
-      setSyncButton("exclamation-sign", "Sync Error")
+      setSyncButton("exclamation-sign", "Sync Error: Cant Reach Server")
 
 # Should return a jQuery promise.
 updatePad = ($pad, serverPad) ->
