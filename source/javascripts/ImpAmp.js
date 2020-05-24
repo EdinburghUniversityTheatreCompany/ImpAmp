@@ -8,6 +8,7 @@
 //= require wavesurfer/webaudio
 //= require wavesurfer/drawer
 //= require StreamSaver
+//= require oboe-browser
 
 //= require modals
 //= require_tree ./FeatureDetection

@@ -140,16 +140,18 @@ class window.IndexedDBStorage
 
     pagePromise.then (e) ->
       lastPageNo = null
-      fileStream = streamSaver.createWriteStream('impamp.iajson', {})
-      writer = fileStream.getWriter()
-      encode = TextEncoder.prototype.encode.bind(new TextEncoder)
-      writer.write(encode("{ \"pages\": {"))
       firstPad = true
 
       padCursor = padStore.getAll()
       padCursor.onerror = (e) -> throw e
       padCursor.onsuccess = (e) ->
         allValues = e.target.result
+
+        fileStream = streamSaver.createWriteStream('impamp.iajson', {})
+        writer = fileStream.getWriter()
+        encode = TextEncoder.prototype.encode.bind(new TextEncoder)
+        writer.write(encode("{ \"padCount\": #{JSON.stringify(allValues.length)}, \"pages\": {"))
+
         promise = Promise.resolve({index: 0, lock: Promise.resolve(0)})
         for _ in allValues
           promise = promise.then (e) ->
@@ -207,42 +209,78 @@ class window.IndexedDBStorage
         )
 
   import: (file, progress, callback) ->
-    reader = new FileReader()
-    reader.onload = (e) =>
-      data = JSON.parse(e.target.result)
+    # oboe file reading based on https://gist.github.com/Aigeec/b202ae4866a9a6bd538dde57f5c30328
+    oboeStream = oboe({disableBufferCheck: true})
+    promises = []
+    complete = 0
+    padCount = 340
 
-      promises = []
-      complete = 0
+    readSingleFile = (file) ->
+      if !file
+        return
+      start = 0
+      stop = 524288 #1024*512
+      reader = new FileReader
+
+      reader.onloadend = (evt) ->
+        if evt.target.readyState == FileReader.DONE
+          oboeStream.emit 'data', evt.target.result
+          if !stop
+            return
+          start = stop
+          stop += 524288 #1024*512
+          if stop > file.size
+            # read to end of file
+            stop = undefined
+          readSlice reader, file, start, stop
+        return
+
+      readSlice reader, file, start, stop
+      return
+
+    readSlice = (reader, file, start, stop) ->
+      blob = file.slice(start, stop)
+      reader.readAsBinaryString blob
+      return
+
+    self = this
+    oboeStream.node 'padCount', (node) -> padCount = node
+
+    oboeStream.node 'pages.*.pads.*', (node) ->
+      ((row, me) ->
+        promises.push( new Promise( (resolve,reject) ->
+          file = impamp.convertDataURIToBlob row.file
+
+          self.setPad row.page, row.key,
+            name: row.name
+            file: file
+            filename: row.filename
+            filesize: row.filesize
+            startTime: row.startTime
+            endTime:   row.endTime
+          , ->
+            resolve()
+          , row.updatedAt
+          , true
+        ).then( ->
+          complete += 1
+          progress?(complete, padCount)
+          return
+        ))
+      )(node, this)
+      return oboeStream.drop
+
+    oboeStream.on 'done', (data) ->
       for num, page of data.pages
-        @setPage num,
+        self.setPage num,
           name:        page.name
           emergencies: page.emergencies
         , null, page.updatedAt
-        for key, row of page.pads
-          ((row, me) ->
-            promises.push( new Promise( (resolve,reject) ->
-              file = impamp.convertDataURIToBlob row.file
-
-              me.setPad row.page, row.key,
-                name: row.name
-                file: file
-                filename: row.filename
-                filesize: row.filesize
-                startTime: row.startTime
-                endTime:   row.endTime
-              , ->
-                resolve()
-              , row.updatedAt
-              , true
-            ).then( ->
-              complete += 1
-              progress?(complete, promises.length)
-              return
-            ))
-          )(row, this)
 
       Promise.all(promises).then( ->
+        progress?(complete, complete)
         callback?()
         return
       )
-    reader.readAsText(file);
+
+    readSingleFile(file)
