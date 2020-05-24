@@ -7,6 +7,7 @@
 //= require wavesurfer/wavesurfer
 //= require wavesurfer/webaudio
 //= require wavesurfer/drawer
+//= require StreamSaver
 
 //= require modals
 //= require_tree ./FeatureDetection

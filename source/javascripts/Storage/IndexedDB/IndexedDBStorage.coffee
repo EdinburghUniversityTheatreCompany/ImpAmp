@@ -1,5 +1,6 @@
 class window.IndexedDBStorage
   @db: null;
+  streamSaver = window.streamSaver
 
   constructor: ->
     @db = null
@@ -118,6 +119,8 @@ class window.IndexedDBStorage
 
   export: ->
     #http://www.raymondcamden.com/index.cfm/2012/8/23/Proof-of-Concept--Build-a-download-feature-for-IndexedDB
+    if !streamSaver.supported
+      return alert("Sorry your browser doesnt support WritableStreams yet try updating yours (chrome should work)")
 
     data = {}
     data.pages = {}
@@ -128,66 +131,80 @@ class window.IndexedDBStorage
 
     pageStore = trans.objectStore("page")
     padStore  = trans.objectStore("pad")
+    pages = {}
 
-    pageCursor = pageStore.openCursor()
-    pageCursor.onsuccess = (e) ->
-      result = e.target.result
-      if result
-        dbPage = result.value
-        dbPage.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
+    pagePromise = new Promise (resolve,reject) ->
+      pageStore.getAll().onsuccess = (event) ->
+        pages = event.target.result
+        resolve()
 
-        page = data.pages[dbPage.pageNo] || {pads: {}}
+    pagePromise.then (e) ->
+      lastPageNo = null
+      fileStream = streamSaver.createWriteStream('impamp.iajson', {})
+      writer = fileStream.getWriter()
+      encode = TextEncoder.prototype.encode.bind(new TextEncoder)
+      writer.write(encode("{ \"pages\": {"))
+      firstPad = true
 
-        page.name        = dbPage.name
-        page.emergencies = dbPage.emergencies
-        page.updatedAt   = dbPage.updatedAt
+      padCursor = padStore.getAll()
+      padCursor.onerror = (e) -> throw e
+      padCursor.onsuccess = (e) ->
+        allValues = e.target.result
+        promise = Promise.resolve({index: 0, lock: Promise.resolve(0)})
+        for _ in allValues
+          promise = promise.then (e) ->
+            new Promise( (resolve,reject) ->
+              e.lock.then( (i) ->
+                cursor = allValues[i]
+                if cursor.page
+                  if cursor.page != lastPageNo
+                    firstPad = true
+                    # write page meta data and start of container
+                    if lastPageNo != null
+                      writer.write(encode("}}, "))
+                    writer.write(encode("\"#{cursor.page}\": {"))
+                    first = true
+                    for key in impamp.pageColumns
+                      if !first
+                        writer.write(encode(", "))
+                      writer.write(encode("\"#{key}\": #{JSON.stringify(pages[cursor.page][key])}"))
+                      first= false
+                    writer.write(encode(', "pads": {'))
+                    lastPageNo = cursor.page
+                  if cursor.filename
+                    if firstPad
+                      firstPad = false
+                    else
+                      writer.write(encode(", "))
 
-        data.pages[dbPage.pageNo] = page
+                    pad = cursor
+                    pad.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
 
-        result.continue();
-        return
+                    filePromise = new Promise( (resolve2,reject2) ->
+                      reader = new FileReader();
+                      reader.onload = (e) ->
+                        pad.file = e.target.result
 
-    padCursor = padStore.openCursor()
-    padCursor.onsuccess = (e) ->
-      result = e.target.result
-      if result
-        if result.value.file
-          pad = result.value
-          pad.readable = true # Shouldn't be necessary, but FireFox isn't allowing access to properties unless you set something first...
-
-          deferred = $.Deferred()
-          promises.push(deferred.promise())
-
-          reader = new FileReader();
-          reader.onload = (e) ->
-            page = data.pages[pad.page] || {pads: {}}
-
-            page.pads[pad.key] = pad
-            pad.file = e.target.result
-
-            data.pages[pad.page] = page
-
-            deferred.resolve()
-            return
-          reader.onerror = (e) ->
-            deferred.reject()
-            throw e
-            return
-          reader.readAsDataURL(pad.file);
-
-        return result.continue();
-
-    trans.oncomplete = ->
-      waiting = $.when.apply($, promises)
-      waiting.then ->
-        console.log "One done"
-        alert("I am working please stay on the page for at least 2 minutes before giving up. If I crash the tab try and free up some ram")
-        return
-      waiting.done ->
-        json = JSON.stringify(data)
-        blob = new Blob([json], { type: "application/json" })
-
-        impamp.saveBlob("impamp.iajson", blob)
+                        writer.write(encode("#{JSON.stringify(cursor.key)}: #{JSON.stringify(pad)}"))
+                        resolve2(i+1)
+                      reader.onerror = (e) ->
+                        throw e
+                        reject2()
+                      reader.readAsDataURL(pad.file);
+                    )
+                    resolve( {index: i+1, lock: filePromise})
+                  else
+                    resolve( {index: i+1, lock: Promise.resolve(i+1)})
+                else
+                  resolve( {index: i+1, lock: Promise.resolve(i+1)})
+              )
+            )
+        promise.then( (e) ->
+          # close: pads, page, pages, object
+          e.lock.then ->
+            writer.write(encode("}}}}"))
+            writer.close()
+        )
 
   import: (file, progress, callback) ->
     reader = new FileReader()
